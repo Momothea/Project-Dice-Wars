@@ -2,25 +2,23 @@ package ui.components;
 
 import java.awt.*;
 import javax.swing.*;
+
+import core.Territoire;
+
 import java.util.*;
 
 public class JTerritoire extends JButton {
 	private static final long serialVersionUID = -5763113073933373564L;
-	private final double SCALE = 1;
-	private boolean isSelected = false;
+	private int mCurrentSize = 0;
+	private Font mInitialFont = null;
 
-	private Color couleurJoueur;
-	private int force;
+	private HashMap<String, Long> voisins;
+	private Territoire territoire;
 
-	public JTerritoire(int force, Color cJoueur) {
-		super(Integer.toString(force) + "🎲");
-
-		Dimension d = super.getPreferredSize();
-		int fontSize = (int) (SCALE * d.getHeight() / 1.5);
-		super.setFont(new Font("Sans", Font.BOLD, fontSize));
-
-		this.force = force;
-		this.couleurJoueur = cJoueur;
+	public JTerritoire(Territoire territoire, HashMap<String, Long> voisins) {
+		this.territoire = territoire;
+		this.voisins = voisins;
+		this.mInitialFont = getFont();
 
 		// Retirer remplissage du bouton
 		setContentAreaFilled(false);
@@ -28,20 +26,22 @@ public class JTerritoire extends JButton {
 		setFocusPainted(false);
 		setMargin(new Insets(0, 0, 0, 0));
 
-		// Set prefered size
-		double height = SCALE * Math.max(d.getHeight(), d.getWidth());
-		double width = height / 2 * (Math.sqrt(3));
-		super.setPreferredSize(new Dimension((int) width, (int) height));
+		// set infobulle
+		setToolTipText(String.format(
+				"<html><body><table><tbody>"
+					+ "<tr><td style='font-weight: bold'>id</td><td>%d</td></tr>"
+					+ "<tr><td style='font-weight: bold'>force</td><td>%d</td></tr>"
+					+ "</tbody></table></body></html>",
+				territoire.getId(), territoire.getForce()));
 	}
-
 
 	public boolean isSelected() {
-		return isSelected;
-	}
-	public void setSelected(boolean isSelected) {
-		this.isSelected = isSelected;
+		return territoire.isSelected();
 	}
 
+	public void setSelected(boolean isSelected) {
+		this.territoire.setSelected(isSelected);
+	}
 
 	public Map<String, int[]> getHexagonPoints() {
 		// Utilisation de la racine 6-ième de l'unité pour générer les points de
@@ -76,24 +76,39 @@ public class JTerritoire extends JButton {
 
 		// Dessin de l'hexagone
 		Graphics2D g2 = (Graphics2D) graphics;
+
+		ButtonModel model = getModel();
+
 		g2.setPaint(new GradientPaint(new Point(0, 0), Color.WHITE, new Point(0, getHeight()),
-				isSelected ? Color.BLACK : couleurJoueur.darker()));
+				territoire.isSelected() ? Color.BLACK
+						: model.isRollover() ? territoire.getCouleurJoueur().brighter()
+								: territoire.getCouleurJoueur().darker()));
 		g2.fill(hexagone);
 
 		// Demande à JButton de dessiner le reste
-		super.setForeground(!isSelected ? Color.BLACK : couleurJoueur.brighter());
+		super.setForeground(!territoire.isSelected() ? Color.BLACK : territoire.getCouleurJoueur());
+		super.setText(Integer.toString(territoire.getForce()));
+
+		// responsive text font size
+		// https://stackoverflow.com/a/30932181
+		int resizal = this.getHeight() / 2;
+		if (resizal != mCurrentSize) {
+			setFont(mInitialFont.deriveFont((float) resizal));
+			mCurrentSize = resizal;
+		}
+
 		super.paintComponent(graphics);
 	}
 
 	@Override
 	protected void paintBorder(Graphics g) {
 		Map<String, int[]> hexagonPoints = getHexagonPoints();
-		boolean topRight = false;
-		boolean right = false;
-		boolean bottomRight = true;
-		boolean bottomLeft = false;
-		boolean left = false;
-		boolean topLeft = false;
+		boolean topRight = voisins.get("top-right") != territoire.getId();
+		boolean right = voisins.get("right") != territoire.getId();
+		boolean bottomRight = voisins.get("bottom-right") != territoire.getId();
+		boolean bottomLeft = voisins.get("bottom-left") != territoire.getId();
+		boolean left = voisins.get("left") != territoire.getId();
+		boolean topLeft = voisins.get("top-left") != territoire.getId();
 
 		int[] xPoints = hexagonPoints.get("xPoints");
 		int[] yPoints = hexagonPoints.get("yPoints");
@@ -130,23 +145,20 @@ public class JTerritoire extends JButton {
 	}
 
 	public static void main(String[] args) {
-		JComponent gui = new JPanel(new FlowLayout());
-		gui.add(new JTerritoire(3, new Color(255, 0, 0)));
-
-		JFrame f = new JFrame("Square Buttons");
-		f.add(gui);
-		// Ensures JVM closes after frame(s) closed and
-		// all non-daemon threads are finished
-		f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		// See http://stackoverflow.com/a/7143398/418556 for demo.
-		f.setLocationByPlatform(true);
-
-		// ensures the frame is the minimum size it needs to be
-		// in order display the components within it
-		f.pack();
-		// should be done last, to avoid flickering, moving,
-		// resizing artifacts.
-		f.setVisible(true);
+		/*
+		 * JComponent gui = new JPanel(new FlowLayout()); gui.add(new JTerritoire(1, 3,
+		 * new Color(255, 0, 0)));
+		 * 
+		 * JFrame f = new JFrame("Square Buttons"); f.add(gui); // Ensures JVM closes
+		 * after frame(s) closed and // all non-daemon threads are finished
+		 * f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // See
+		 * http://stackoverflow.com/a/7143398/418556 for demo.
+		 * f.setLocationByPlatform(true);
+		 * 
+		 * // ensures the frame is the minimum size it needs to be // in order display
+		 * the components within it f.setSize(400,400);; // should be done last, to
+		 * avoid flickering, moving, // resizing artifacts. f.setVisible(true);
+		 */
 	}
 
 }
