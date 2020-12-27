@@ -31,8 +31,9 @@ public class JTerritoire extends JButton {
 				"<html><body><table><tbody>"
 					+ "<tr><td style='font-weight: bold'>id</td><td>%d</td></tr>"
 					+ "<tr><td style='font-weight: bold'>force</td><td>%d</td></tr>"
+					+ "<tr><td style='font-weight: bold'>voisins</td><td>%s</td></tr>"
 					+ "</tbody></table></body></html>",
-				territoire.getId(), territoire.getForce()));
+				territoire.getId(), territoire.getForce(), territoire.getVoisins().toString()));
 	}
 
 	public boolean isSelected() {
@@ -43,7 +44,7 @@ public class JTerritoire extends JButton {
 		this.territoire.setSelected(isSelected);
 	}
 
-	public Map<String, int[]> getHexagonPoints() {
+	protected Map<String, int[]> getHexagonPoints() {
 		// Utilisation de la racine 6-ième de l'unité pour générer les points de
 		// l'hexagone
 		// rotation de 90° en remplaçant les cos par les sin et vice verca
@@ -69,7 +70,7 @@ public class JTerritoire extends JButton {
 
 	// https://www.codeproject.com/Articles/62099/UI-Component-Development-in-Java-Swing-Part-1-Desi
 	@Override
-	public void paintComponent(Graphics graphics) {
+	protected void paintComponent(Graphics graphics) {
 		// création du polygone
 		Map<String, int[]> hexagonPoints = getHexagonPoints();
 		Polygon hexagone = new Polygon(hexagonPoints.get("xPoints"), hexagonPoints.get("yPoints"), 6);

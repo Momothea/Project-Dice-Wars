@@ -5,10 +5,9 @@ import java.util.*;
 
 public class Territoire {
 	private long id;
-	private long idJoueur;
-	private Color couleurJoueur;
+	private Joueur joueur;
 	private int force;
-	private Set<Integer> voisins = new HashSet<>();
+	private Set<Long> voisins = new HashSet<>();
 	
 	private boolean isSelected = false;
 
@@ -24,20 +23,16 @@ public class Territoire {
 		this.id = id;
 	}
 
-	public long getIdJoueur() {
-		return idJoueur;
+	public Joueur getJoueur() {
+		return joueur; // rendre plus secure
 	}
 
-	public void setIdJoueur(long idJoueur) {
-		this.idJoueur = idJoueur;
+	public void setJoueur(Joueur owner) {
+		this.joueur = owner;
 	}
 
 	public Color getCouleurJoueur() {
-		return couleurJoueur;
-	}
-
-	public void setCouleurJoueur(Color couleurJoueur) {
-		this.couleurJoueur = couleurJoueur;
+		return joueur.getCouleur();
 	}
 
 	public int getForce() {
@@ -48,12 +43,12 @@ public class Territoire {
 		this.force = force;
 	}
 
-	public Set<Integer> getVoisins() {
-		return voisins;
+	public Set<Long> getVoisins() {
+		return voisins; // rendre plus secure
 	}
 
-	public void setVoisins(Set<Integer> voisins) {
-		this.voisins = voisins;
+	public void addVoisins(Long voisinId) {
+		voisins.add(voisinId);
 	}
 
 	public boolean isSelected() {
@@ -64,5 +59,8 @@ public class Territoire {
 		this.isSelected = isSelected;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "Territoire [id=" + id + "]";
+	}
 }

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
 public class Carte {
@@ -40,21 +41,49 @@ public class Carte {
 
 			int posX = randX.nextInt(29) + 2;
 			int posY = randY.nextInt(29) + 2;
+			
+			// Si la position est valide, ajouter le territoire et l'agrandir !
+			if (k == 0 || positionValide(posX, posY)) {
+				// Si emplacement de la carte est vide, la remplir d'un nouveau territoire
+				if (carte[posX][posY] == null) {
+					k++; // augmenter le nb de territoire créé et le créer,...
+					Territoire nouvTerr = new Territoire(k + 1);
+					
+					// ... le placer,...
+					carte[posX][posY] = nouvTerr;
+					// ... l'ajouter à la liste des territoires
+					territoires.add(nouvTerr);
+					// ... et l'agrandir
+					agrandirTerrain(nouvTerr, posX, posY);
+				}	
+			}
 
-			// Si emplacement de la carte est vide, la remplir d'un nouveau territoire
-			if (carte[posX][posY] == null) {
-				k++; // augmenter le nb de territoire créé et le créer,...
-				Territoire nouvTerr = new Territoire(k + 1);
-
-				// ... le placer,...
-				carte[posX][posY] = nouvTerr;
-				// ... l'ajouter à la liste des territoires
-				territoires.add(nouvTerr);
-				// ... et l'agrandir
-				agrandirTerrain(nouvTerr, posX, posY);
-
+		}
+		
+		/*
+		 * Calcul des voisins pour chaque territoire
+		 * =========================================
+		 */
+		for (int i = 0; i < 33; i++) {
+			for (int j = 0; j < 33; j++) {
+				// obtenir les voisins pour chaque territoire
+				HashMap<String, Long> voisins = getTerrainsVoisins(i,j);
+				
+				// et les ajouter
+				for (Map.Entry<String, Long> mapVoisin : voisins.entrySet()) {
+					Long mapVoisinValue = mapVoisin.getValue();
+					Territoire curTerr = carte[i][j];
+					
+					if (mapVoisinValue != 0 && curTerr != null) {
+						// ne pas ajouter soi-même
+						if (mapVoisinValue != curTerr.getId()) {
+							curTerr.addVoisins(mapVoisinValue);
+						}
+					}
+				}
 			}
 		}
+		
 
 		/*
 		 * Distribution des territoires aux joueurs
@@ -71,8 +100,10 @@ public class Carte {
 			for (int j = 0; j <= nb_terr_par_joueur; j++) {
 				Territoire terrJoueur = territoires.get(i * nb_terr_par_joueur + j);
 				// attribution joueur
-				terrJoueur.setIdJoueur(joueurs.get(i).getId());
-				terrJoueur.setCouleurJoueur(joueurs.get(i).getCouleur());
+				// et ajout ce territoire a la liste du territoire du joueur
+				Joueur joueur = joueurs.get(i);
+				joueur.addTerritoire(terrJoueur);
+				terrJoueur.setJoueur(joueur);
 
 				// initialisation force à 1
 				int force = 1;
@@ -147,15 +178,30 @@ public class Carte {
 		return voisins;
 	}
 
-	public void agrandirTerrain(Territoire territoire, int posX, int posY) {
+	protected boolean positionValide(int posX, int posY) {
+		HashMap<String, Long> voisins = getTerrainsVoisins(posX, posY);
+		
+		int nbIdVide = 0;
+		
+		for(Map.Entry<String, Long> curEntry : voisins.entrySet()) {
+			if(curEntry.getValue() != 0) {
+				nbIdVide++;
+			}
+		}
+		
+		return nbIdVide > 0 && nbIdVide < 6;
+	}
+	
+	protected void agrandirTerrain(Territoire territoire, int posX, int posY) {
 		Random randTaille = new Random();
-		int tailleTerr = randTaille.nextInt(25 - 7) + 7;
+		int tailleTerr = randTaille.nextInt(25 - 7) + 7; // taille aproximative du terrain
 
 		int t = 0;
+		boolean forceContinue = false;
 		LinkedList<Point> fileAgrTerr = new LinkedList<>();
 		fileAgrTerr.add(new Point(posX, posY));
 
-		while (t <= tailleTerr) {
+		while (t <= tailleTerr || forceContinue) {
 			Point pt_courant = fileAgrTerr.poll();
 
 			// generation nb aleatoire
@@ -231,16 +277,21 @@ public class Carte {
 
 			} else {
 				// On ne peut plus expand le terrain,
+				if(!forceContinue) {
+					forceContinue = true;
+				} 
 				// quitter la boucle
-				t = tailleTerr + 1;
-
+				else {
+					forceContinue = false;
+					t = tailleTerr + 1;					
+				}
 			}
 
 		}
 	}
 
 	public Territoire[][] getCarte() {
-		return carte;
+		return carte; // rendre plus secure
 	}
 
 	@Override

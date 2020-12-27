@@ -26,40 +26,31 @@ public class JCarte extends JPanel {
 	private int t_width = 24;
 	private int t_height = 24;
 
-	private JTerritoire[][] hexButtons = new JTerritoire[ROWS][COLUMNS];
+	private JTerritoire[][] carteTerritoires = new JTerritoire[ROWS][COLUMNS];
 
 	public JCarte(Carte carte) {
 		setLayout(null);
-		setPreferredSize(new Dimension(t_width * (COLUMNS + 1), (int) Math.round( t_height*(0.75*(ROWS + 1) + 1))));
+		setPreferredSize(new Dimension((int) Math.round(t_width * (COLUMNS + (Math.sqrt(3)/4))), (int) Math.round( t_height*(0.75*(ROWS -1) + 1) )));
 		initGUI(carte);
 	}
 
 	public void initGUI(Carte carte) {
 		Territoire[][] matCarte = carte.getCarte();
 
-		int offsetY = (int) Math.round(0.25 * t_height);
-
 		for (int row = 0; row < ROWS; row++) {
-
-			int offsetX = (row % 2 == 0 ? 0 : (int) Math.round(t_width / 2)) + (int) Math.round(0.125 * t_width);
 			for (int col = 0; col < COLUMNS; col++) {
 				if (matCarte[row][col] != null) {
-					hexButtons[row][col] = new JTerritoire(matCarte[row][col], carte.getTerrainsVoisins(row, col));
-					hexButtons[row][col].addActionListener(new ActionListener() {
+					carteTerritoires[row][col] = new JTerritoire(matCarte[row][col], carte.getTerrainsVoisins(row, col));
+					carteTerritoires[row][col].addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							JTerritoire clickedButton = (JTerritoire) e.getSource();
 							clickedButton.setSelected(!clickedButton.isSelected());
 						}
 					});
-					add(hexButtons[row][col]);
-					hexButtons[row][col].setBounds(offsetX, offsetY, t_width, t_height);
-
+					add(carteTerritoires[row][col]);
 				}
-				offsetX += t_width;
 			}
-
-			offsetY += (int) (t_height * 0.75);
 		}
 	}
 
@@ -68,21 +59,23 @@ public class JCarte extends JPanel {
 	@Override
 	// Responsiveness de la JCarte
 	public void paint(Graphics g) {
-		t_width = getWidth() / COLUMNS;
-		t_height = (int) Math.round(getHeight() / (0.75*ROWS + 1));
+		int def_t_width = (int) Math.floor(getWidth() / (COLUMNS + (Math.sqrt(3)/4)));
+		int def_t_height = (int) Math.floor(getHeight() / (0.75*(ROWS -1) + 1));
 		
-		// final width et height des JTerritoire
-		t_width = Math.min(t_width, t_height);
+		// final width et height des JTerritoire (Rendre carré les JTerritoire)
+		t_width = Math.min(def_t_width, def_t_height);
 		t_height = t_width;
 		
-		int offsetY = (int) Math.round(0.25 * t_height);
+		// centrage JCarte
+		int offsetY = (getHeight() - (int) Math.round( t_height*(0.75*(ROWS -1) + 1) )) / 2;
+		int centeredOffsetX = (getWidth() - (int) Math.round(t_width * (COLUMNS + (Math.sqrt(3)/4)))) / 2; 
 		
 		// Mettre les JTerritoire à la même taille
 		for (int row = 0; row < ROWS; row++)  {
-			int offsetX = (row % 2 == 0 ? 0 : (int) Math.round(t_width / 2)) + (int) Math.round(0.125 * t_width);
+			int offsetX = (row % 2 == 0 ? centeredOffsetX : centeredOffsetX + (int) Math.round(t_width / 2)) + (int) Math.round(0.125 * t_width);
 			for (int col = 0; col < COLUMNS; col++) {
-				if (hexButtons[row][col] != null) {
-					hexButtons[row][col].setBounds(offsetX, offsetY, t_width, t_height);
+				if (carteTerritoires[row][col] != null) {
+					carteTerritoires[row][col].setBounds(offsetX, offsetY, t_width, t_height);
 				}
 				offsetX += t_width;
 			}

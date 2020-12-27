@@ -33,8 +33,21 @@ public class Joueur {
 		this.couleur = couleur;
 	}
 
+	public Set<Territoire> getListeTerritoire() {
+		return listeTerritoire; // rendre plus secure
+	}
 	
+	public void addTerritoire(Territoire e) {
+		listeTerritoire.add(e);
+	}
+
+
+	@Override
+	public String toString() {
+		return "Joueur [id=" + id + ", couleur=" + couleur + ", listeTerritoire=" + listeTerritoire + "]";
+	}
 	
+
 	public void attaquerTerritoire(Territoire tAttaquant, Territoire tAtaquee) {
 		
 	}
