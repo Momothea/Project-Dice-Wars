@@ -28,12 +28,10 @@ public class JTerritoire extends JButton {
 
 		// set infobulle
 		setToolTipText(String.format(
-				"<html><body><table><tbody>"
-					+ "<tr><td style='font-weight: bold'>id</td><td>%d</td></tr>"
-					+ "<tr><td style='font-weight: bold'>force</td><td>%d</td></tr>"
-					+ "<tr><td style='font-weight: bold'>voisins</td><td>%s</td></tr>"
-					+ "</tbody></table></body></html>",
-				territoire.getId(), territoire.getForce(), territoire.getVoisins().toString()));
+				"<html>" + "<p><strong>id     :</strong> %d</p>" + "<p><strong>force   :</strong> %d</p>"
+						+ "<p><strong>Joueur  :</strong> %d</p>" + "<p><strong>voisins :</strong> %s</p>" + "</html>",
+				territoire.getId(), territoire.getForce(), territoire.getJoueur().getId(),
+				territoire.getVoisins().toString()));
 	}
 
 	public boolean isSelected() {

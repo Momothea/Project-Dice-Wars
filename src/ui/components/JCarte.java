@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -88,11 +87,11 @@ public class JCarte extends JPanel {
 	public static void main(String[] args) {
 		int nbJoueurs = 7;
 		Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK, Color.CYAN, Color.MAGENTA, Color.RED, Color.YELLOW };
-		ArrayList<Joueur> joueurs = new ArrayList<>(nbJoueurs);
+		Joueur[] joueurs = new Joueur[nbJoueurs];
 		System.out.println("Création joueurs...");
 		for (int i = 0; i < nbJoueurs; i++) {
 			Joueur newJoueur = new Joueur(i + 1, colors[i]);
-			joueurs.add(newJoueur);
+			joueurs[i] = newJoueur;
 		}
 		System.out.println("Création carte...");
 		Carte map = new Carte(joueurs);

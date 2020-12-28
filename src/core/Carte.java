@@ -1,6 +1,5 @@
 package core;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +16,8 @@ public class Carte {
 	private Territoire[][] carte = new Territoire[33][33];
 
 	// Ctor avec règles du jeu
-	public Carte(ArrayList<Joueur> joueurs) {
-		this.nbJoueurs = joueurs.size();
+	public Carte(Joueur[] joueurs) {
+		this.nbJoueurs = joueurs.length;
 
 		// générer un nombre de territoire entre 22 et 43 multiple du nombre de joueurs
 		// (min|max)_nb_territoire = 0, nb_joueur = 2
@@ -35,7 +34,7 @@ public class Carte {
 		 * ===================================================
 		 */
 		int k = 0;
-		while (k <= nbTerritoire) {
+		while (k < nbTerritoire) {
 			Random randX = new Random();
 			Random randY = new Random();
 
@@ -89,6 +88,8 @@ public class Carte {
 		 * Distribution des territoires aux joueurs
 		 * ========================================
 		 */
+		Joueur.setNbTerritoire(nbTerritoire);
+		
 		int nb_des_par_joueur = 5 * (nbTerritoire / nbJoueurs);
 		int[] nbDesJoueurs = new int[nbJoueurs];
 		Arrays.fill(nbDesJoueurs, nb_des_par_joueur);
@@ -96,12 +97,13 @@ public class Carte {
 
 		// mélanger liste territoire
 		Collections.shuffle(territoires);
+		
 		for (int i = 0; i < nbJoueurs; i++) {
-			for (int j = 0; j <= nb_terr_par_joueur; j++) {
+			for (int j = 0; j < nb_terr_par_joueur; j++) {
 				Territoire terrJoueur = territoires.get(i * nb_terr_par_joueur + j);
 				// attribution joueur
 				// et ajout ce territoire a la liste du territoire du joueur
-				Joueur joueur = joueurs.get(i);
+				Joueur joueur = joueurs[i];
 				joueur.addTerritoire(terrJoueur);
 				terrJoueur.setJoueur(joueur);
 
@@ -128,7 +130,7 @@ public class Carte {
 			
 			// verif somme des territoires
 			int sommeDesTerr = 0;
-			for (int t = 0; t <= nb_terr_par_joueur; t++) {
+			for (int t = 0; t < nb_terr_par_joueur; t++) {
 				sommeDesTerr += territoires.get(i * nb_terr_par_joueur + t).getForce();
 			}
 			
@@ -308,17 +310,4 @@ public class Carte {
 		return result += "\n";
 	}
 
-	public static void main(String[] args) {
-		int nbJoueurs = 7;
-		Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK, Color.ORANGE, Color.MAGENTA, Color.RED, Color.YELLOW };
-		ArrayList<Joueur> joueurs = new ArrayList<>(nbJoueurs);
-		System.out.println("Création joueurs...");
-		for (int i = 0; i < nbJoueurs; i++) {
-			Joueur newJoueur = new Joueur(i + 1, colors[i]);
-			joueurs.add(newJoueur);
-		}
-		System.out.println("Création carte...");
-		Carte map = new Carte(joueurs);
-		System.out.println(map);
-	}
 }

@@ -1,20 +1,19 @@
 package core;
 
 import java.awt.Color;
-import java.util.ArrayList;
 
 public class Partie {
-	private ArrayList<Joueur> joueurs;
+	private Joueur[] joueurs;
 	private Carte carte;
 	
 	public Partie(int nbJoueurs) {
-		Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK, Color.ORANGE, Color.MAGENTA, Color.RED, Color.YELLOW };
-		this.joueurs = new ArrayList<>();
+		Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK, Color.CYAN, Color.MAGENTA, Color.RED, Color.YELLOW };
+		this.joueurs = new Joueur[nbJoueurs];
 		
 		// Création joueur
 		for (int i = 0; i < nbJoueurs; i++) {
 			Joueur newJoueur = new Joueur(i + 1, colors[i]);
-			joueurs.add(newJoueur);
+			joueurs[i] = newJoueur;
 		}
 		
 		// Création et initialisation de la carte
@@ -22,7 +21,7 @@ public class Partie {
 		
 	}
 
-	public ArrayList<Joueur> getJoueurs() {
+	public Joueur[] getJoueurs() {
 		return joueurs; // rendre plus secure
 	}
 

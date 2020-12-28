@@ -32,7 +32,7 @@ public class Territoire {
 	}
 
 	public Color getCouleurJoueur() {
-		return joueur.getCouleur();
+		return joueur != null ? joueur.getCouleur() : Color.BLACK;
 	}
 
 	public int getForce() {
