@@ -28,9 +28,9 @@ public class JTerritoire extends JButton {
 
 		// set infobulle
 		setToolTipText(String.format(
-				"<html>" + "<p><strong>id     :</strong> %d</p>" + "<p><strong>force   :</strong> %d</p>"
+				"<html>" + "<p><strong>id     :</strong> %d (%s)</p>" + "<p><strong>force   :</strong> %d</p>"
 						+ "<p><strong>Joueur  :</strong> %d</p>" + "<p><strong>voisins :</strong> %s</p>" + "</html>",
-				territoire.getId(), territoire.getForce(), territoire.getJoueur().getId(),
+				territoire.getId(), territoire , territoire.getForce(), territoire.getJoueur().getId(),
 				territoire.getVoisins().toString()));
 	}
 
@@ -40,6 +40,10 @@ public class JTerritoire extends JButton {
 
 	public void setSelected(boolean isSelected) {
 		this.territoire.setSelected(isSelected);
+	}
+	
+	public Territoire getTerritoire() {
+		return territoire; // ne pas rendre immutable !
 	}
 
 	protected Map<String, int[]> getHexagonPoints() {

@@ -26,7 +26,8 @@ public class JCarte extends JPanel {
 	private int t_height = 24;
 
 	private JTerritoire[][] carteTerritoires = new JTerritoire[ROWS][COLUMNS];
-
+	private Territoire tAttaquant;
+	
 	public JCarte(Carte carte) {
 		setLayout(null);
 		setPreferredSize(new Dimension((int) Math.round(t_width * (COLUMNS + (Math.sqrt(3)/4))), (int) Math.round( t_height*(0.75*(ROWS -1) + 1) )));
@@ -44,7 +45,8 @@ public class JCarte extends JPanel {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							JTerritoire clickedButton = (JTerritoire) e.getSource();
-							clickedButton.setSelected(!clickedButton.isSelected());
+							// clickedButton.setSelected(!clickedButton.isSelected());
+							joueurAttaque(clickedButton.getTerritoire());
 						}
 					});
 					add(carteTerritoires[row][col]);
@@ -53,6 +55,25 @@ public class JCarte extends JPanel {
 		}
 	}
 
+	
+	public void joueurAttaque(Territoire terrSelectionne) {
+		// force repaint
+		repaint();
+		
+		if (tAttaquant == null) {
+			tAttaquant = terrSelectionne;
+			tAttaquant.setSelected(true);
+		} else {
+			System.out.printf("Attaque Terr %d contre Terr %d\n", tAttaquant.getId(), terrSelectionne.getId());
+			terrSelectionne.setSelected(true);
+			// TODO lancer fct attaque ici !!!
+			
+			// remettre à 0 les territoires selectionnes
+			tAttaquant.setSelected(false);
+			terrSelectionne.setSelected(false);
+			tAttaquant = null;
+		}
+	}
 	
 
 	@Override

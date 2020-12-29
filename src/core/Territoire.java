@@ -59,8 +59,4 @@ public class Territoire {
 		this.isSelected = isSelected;
 	}
 	
-	@Override
-	public String toString() {
-		return "Territoire [id=" + id + "]";
-	}
 }
