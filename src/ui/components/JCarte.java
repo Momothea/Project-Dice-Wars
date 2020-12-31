@@ -1,5 +1,6 @@
 package ui.components;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -26,21 +27,31 @@ public class JCarte extends JPanel {
 	private int t_height = 24;
 
 	private JTerritoire[][] carteTerritoires = new JTerritoire[ROWS][COLUMNS];
+	private JPanel gCarte; // panel contenant la représentation graphique de la carte
+	private JAttaque statusAttaque; // panel contenant les informations sur l'attaque en cours
 	private Territoire tAttaquant;
-	
+
 	public JCarte(Carte carte) {
-		setLayout(null);
-		setPreferredSize(new Dimension((int) Math.round(t_width * (COLUMNS + (Math.sqrt(3)/4))), (int) Math.round( t_height*(0.75*(ROWS -1) + 1) )));
+		setLayout(new BorderLayout());
 		initGUI(carte);
 	}
 
 	public void initGUI(Carte carte) {
 		Territoire[][] matCarte = carte.getCarte();
 
+		/*
+		 * Composant carte ===============
+		 */
+		gCarte = new JPanel();
+		gCarte.setLayout(null);
+		gCarte.setPreferredSize(new Dimension((int) Math.round(t_width * (COLUMNS + (Math.sqrt(3) / 4))),
+				(int) Math.round(t_height * (0.75 * (ROWS - 1) + 1))));
+
 		for (int row = 0; row < ROWS; row++) {
 			for (int col = 0; col < COLUMNS; col++) {
 				if (matCarte[row][col] != null) {
-					carteTerritoires[row][col] = new JTerritoire(matCarte[row][col], carte.getTerrainsVoisins(row, col));
+					carteTerritoires[row][col] = new JTerritoire(matCarte[row][col],
+							carte.getTerrainsVoisins(row, col));
 					carteTerritoires[row][col].addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -49,50 +60,58 @@ public class JCarte extends JPanel {
 							joueurAttaque(clickedButton.getTerritoire());
 						}
 					});
-					add(carteTerritoires[row][col]);
+					gCarte.add(carteTerritoires[row][col]);
 				}
 			}
 		}
+
+		add(gCarte, BorderLayout.CENTER);
+
+		/*
+		 * Info attaque ============
+		 */
+		statusAttaque = new JAttaque();
+		add(statusAttaque, BorderLayout.SOUTH);
 	}
 
-	
 	public void joueurAttaque(Territoire terrSelectionne) {
 		// force repaint
 		repaint();
-		
+
 		if (tAttaquant == null) {
 			tAttaquant = terrSelectionne;
 			tAttaquant.setSelected(true);
 		} else {
 			System.out.printf("Attaque Terr %d contre Terr %d\n", tAttaquant.getId(), terrSelectionne.getId());
 			terrSelectionne.setSelected(true);
-			// TODO lancer fct attaque ici !!!
-			
+			// TODO lancer fct attaque ici !!
+			statusAttaque.showAttaque(tAttaquant, terrSelectionne);
+
 			// remettre à 0 les territoires selectionnes
 			tAttaquant.setSelected(false);
 			terrSelectionne.setSelected(false);
 			tAttaquant = null;
 		}
 	}
-	
 
 	@Override
 	// Responsiveness de la JCarte
 	public void paint(Graphics g) {
-		int def_t_width = (int) Math.floor(getWidth() / (COLUMNS + (Math.sqrt(3)/4)));
-		int def_t_height = (int) Math.floor(getHeight() / (0.75*(ROWS -1) + 1));
-		
+		int def_t_width = (int) Math.floor(gCarte.getWidth() / (COLUMNS + (Math.sqrt(3) / 4)));
+		int def_t_height = (int) Math.floor(gCarte.getHeight() / (0.75 * (ROWS - 1) + 1));
+
 		// final width et height des JTerritoire (Rendre carré les JTerritoire)
 		t_width = Math.min(def_t_width, def_t_height);
 		t_height = t_width;
-		
+
 		// centrage JCarte
-		int offsetY = (getHeight() - (int) Math.round( t_height*(0.75*(ROWS -1) + 1) )) / 2;
-		int centeredOffsetX = (getWidth() - (int) Math.round(t_width * (COLUMNS + (Math.sqrt(3)/4)))) / 2; 
-		
+		int offsetY = (gCarte.getHeight() - (int) Math.round(t_height * (0.75 * (ROWS - 1) + 1))) / 2;
+		int centeredOffsetX = (gCarte.getWidth() - (int) Math.round(t_width * (COLUMNS + (Math.sqrt(3) / 4)))) / 2;
+
 		// Mettre les JTerritoire à la même taille
-		for (int row = 0; row < ROWS; row++)  {
-			int offsetX = (row % 2 == 0 ? centeredOffsetX : centeredOffsetX + (int) Math.round(t_width / 2)) + (int) Math.round(0.125 * t_width);
+		for (int row = 0; row < ROWS; row++) {
+			int offsetX = (row % 2 == 0 ? centeredOffsetX : centeredOffsetX + (int) Math.round(t_width / 2))
+					+ (int) Math.round(0.125 * t_width);
 			for (int col = 0; col < COLUMNS; col++) {
 				if (carteTerritoires[row][col] != null) {
 					carteTerritoires[row][col].setBounds(offsetX, offsetY, t_width, t_height);
@@ -101,7 +120,7 @@ public class JCarte extends JPanel {
 			}
 			offsetY += (int) (t_height * 0.75);
 		}
-		
+
 		super.paint(g);
 	}
 
@@ -122,7 +141,7 @@ public class JCarte extends JPanel {
 		JFrame frame = new JFrame();
 		frame.setTitle("Hexagon Pattern");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.add(hexPattern);
+		frame.getContentPane().add(hexPattern);
 		frame.pack();
 		frame.setVisible(true);
 	}

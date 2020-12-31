@@ -26,6 +26,7 @@ import javax.swing.JButton;
 import java.awt.FlowLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.geom.AffineTransform;
 
 public class PartieUI {
 	private JFrame frame;
@@ -72,6 +73,12 @@ public class PartieUI {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 640, 480);
+		
+		// Get scale due to hiDPI Screen
+		AffineTransform scale = frame.getGraphicsConfiguration().getDefaultTransform();
+		frame.setMinimumSize(new Dimension((int) Math.floor(640*scale.getScaleX()),(int) Math.floor(480*scale.getScaleY())));
+		
+		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		/*
@@ -135,27 +142,12 @@ public class PartieUI {
 
 		JScrollPane listScrollPane = new JScrollPane(lstTourJoueur);
 		infoTour.add(listScrollPane, BorderLayout.CENTER);
-
-		/*
-		 * Ajout status bar avec info attaque
-		 * ==================================
-		 */
-		JPanel statusBar = new JPanel();
-		statusBar.setLayout(new BorderLayout());
-		frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
-		
-		// Ajouter info attaque
-		JAttaque statusAttaque = new JAttaque();
-		statusBar.add(statusAttaque, BorderLayout.CENTER);
 		
 		// Ajouter bouton fin Tour
-		JPanel btnFinContainer = new JPanel();
 		JButton btnFinTour = new JButton("Fin Tour >>");
-		btnFinContainer.add(btnFinTour);
-		statusBar.add(btnFinContainer, BorderLayout.EAST);
+		infoTour.add(btnFinTour, BorderLayout.SOUTH);
 
 		
-
 		/*
 		 * Ajouter JCarte ==============
 		 */
