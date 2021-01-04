@@ -42,6 +42,7 @@ public class Joueur {
 		listeTerritoire.add(e);
 	}
 
+
 	public static int getNbTerritoire() {
 		return nbTerritoire;
 	}
@@ -76,6 +77,29 @@ public class Joueur {
 	// https://stackoverflow.com/a/49917501
 	public static int sommeDe(ArrayList<Integer> des) {
 		return des.stream().mapToInt(de -> de).sum();
+	}
+	
+	private void victoireAttaque(Territoire tAttaquant, Territoire tAttaquee) {
+		// Ajout territoire gagné
+		addTerritoire(tAttaquee);
+		
+		// déplacer tout ses dés sur le territoire conquis sauf 1...
+		int nbDeAttaquant = tAttaquant.getForce();
+		tAttaquee.setForce(nbDeAttaquant - 1);
+		tAttaquee.setJoueur(this);
+
+		// ...qui reste sur le territoire de départ
+		Territoire tDepart = listeTerritoire.stream().filter(t -> t.getId() == tAttaquant.getId())
+				.findFirst().orElse(null);
+		tDepart.setForce(1);
+	}
+
+	private void defaiteAttaque(Territoire tAttaquant) {
+		// Ne conserve qu'un seul dé sur le territoire de départ...
+		Territoire tDepart = listeTerritoire.stream().filter(t -> t.getId() == tAttaquant.getId())
+				.findFirst().orElse(null);
+		tDepart.setForce(1);
+		// ...et le territoire attaqué reste inchangé
 	}
 
 	public Map<String, ArrayList<Integer>> attaquerTerritoire(Territoire tAttaquant, Territoire tAttaquee)
@@ -121,10 +145,10 @@ public class Joueur {
 		 */
 		if (Joueur.sommeDe(desAttaquant) > Joueur.sommeDe(desAttaquee)) {
 			// Victoire
-			System.out.println("Victoire");
+			victoireAttaque(tAttaquant, tAttaquee);
 		} else {
 			// Défaite
-			System.out.println("Défaite");
+			defaiteAttaque(tAttaquant);
 		}
 
 		// retourner les dés de l'attaque

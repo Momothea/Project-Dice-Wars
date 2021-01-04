@@ -119,16 +119,14 @@ public class JAttaque extends JPanel {
 		dicesAttaque.removeAll();
 
 		// ajout dé attaquant
-		int nbDeAttaquant = terrAttaquant.getForce();
 		Color colorAttaquant = terrAttaquant.getCouleurJoueur();
-		for (int i = 0; i < nbDeAttaquant; i++) {
+		for (int i = 0; i < desAttaquant.size(); i++) {
 			dicesAttaquant.add(new JDice((int) desAttaquant.get(i), colorAttaquant));
 		}
 
 		// ajout dé attaqué
-		int nbDeAttaque = terrAttaque.getForce();
 		Color colorAttaque = terrAttaque.getCouleurJoueur();
-		for (int i = 0; i < nbDeAttaque; i++) {
+		for (int i = 0; i < desAttaquee.size(); i++) {
 			dicesAttaque.add(new JDice((int) desAttaquee.get(i), colorAttaque));
 		}
 
