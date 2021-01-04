@@ -6,7 +6,7 @@ import java.util.*;
 public class Joueur {
 	private long id;
 	private Color couleur;
-	private Set<Territoire> listeTerritoire = new HashSet<>();
+	private List<Territoire> listeTerritoire = new ArrayList<>();
 	private static int nbTerritoire = 1;
 
 	public Joueur(long id) {
@@ -34,7 +34,7 @@ public class Joueur {
 		this.couleur = couleur;
 	}
 
-	public Set<Territoire> getListeTerritoire() {
+	public List<Territoire> getListeTerritoire() {
 		return listeTerritoire; // rendre plus secure
 	}
 
@@ -54,14 +54,77 @@ public class Joueur {
 	public String toString() {
 		// return "Joueur [id=" + id + ", couleur=" + couleur + ", listeTerritoire=" +
 		// listeTerritoire + "]";
-		return String.format("<html>"
-				+ "<h3 style='margin: 0.5em 0'>Joueur %d</h3>"
-				+ "<p style='padding-left: 10px'>Nb terr: %d<small>/%d</small> (%d %%)</p>"
-				+ "</html>", 
-				id, listeTerritoire.size(), nbTerritoire, (listeTerritoire.size()*100) / nbTerritoire);
+		return String.format(
+				"<html>" + "<h3 style='margin: 0.5em 0'>Joueur %d</h3>"
+						+ "<p style='padding-left: 10px'>Nb terr: %d<small>/%d</small> (%d %%)</p>" + "</html>",
+				id, listeTerritoire.size(), nbTerritoire, (listeTerritoire.size() * 100) / nbTerritoire);
+	}
+	
+	/*
+	 * Gestion attaque
+	 */
+	private static ArrayList<Integer> lanceDe(int nbDes) {
+		ArrayList<Integer> des = new ArrayList<>(nbDes);
+		for (int i = 0; i < nbDes; i++) {
+			Random nb_aleat = new Random();
+			int faceDe = nb_aleat.nextInt(6) + 1;
+			des.set(i, faceDe);
+		}
+		return des;
+	}
+	
+	// https://stackoverflow.com/a/49917501
+	private static int sommeDe(ArrayList<Integer> des) {
+		return des.stream().mapToInt(de -> de).sum();
 	}
 
-	public void attaquerTerritoire(Territoire tAttaquant, Territoire tAtaquee) {
+	public void attaquerTerritoire(Territoire tAttaquant, Territoire tAttaquee) throws InvalidMoveException {
+		/*
+		 * Vérifications =============
+		 */
+		// tAttaquant a plus de 1 dés
+		if (tAttaquant.getForce() <= 1) {
+			throw new InvalidMoveException(String.format("Ne peut étendre Terr. %d (1 dé)", tAttaquant.getId()));
+		}
+
+		// tAttaquant n'appartient pas à ce joueur
+		if (tAttaquant.getJoueur().getId() != getId()) {
+			throw new InvalidMoveException(String.format("Terr. %d ne vous appartient pas !", tAttaquant.getId()));
+		}
+
+		// tAttaquee est déjà à ce joueur
+		if (tAttaquee.getJoueur().getId() == getId()) {
+			throw new InvalidMoveException(String.format("Terr. %d vous appartient déjà", tAttaquee.getId()));
+		}
+
+		// tAttaquee est bien voisin de tAttaquant
+		if (!tAttaquant.getVoisins().contains(tAttaquee.getId())) {
+			throw new InvalidMoveException(
+					String.format("Terr. %d n'est pas voisin de Terr. %d", tAttaquee.getId(), tAttaquant.getId()));
+		}
+
+		/*
+		 * Attaque =======
+		 */
+		// lancer dé attaquant
+		int nbDeAttaquant = tAttaquant.getForce();
+		ArrayList<Integer> desAttaquant = Joueur.lanceDe(nbDeAttaquant);
+
+		// lancer dé attaquee
+		int nbDeAttaquee = tAttaquee.getForce();
+		ArrayList<Integer> desAttaquee = Joueur.lanceDe(nbDeAttaquee);
+		
+		/*
+		 * Résultat attaque
+		 * ================
+		 */
+		if(Joueur.sommeDe(desAttaquant) > Joueur.sommeDe(desAttaquee)) {
+			// Victoire
+			System.out.println("Victoire");
+		} else {
+			// Défaite
+			System.out.println("Défaite");
+		}
 
 	}
 

@@ -13,7 +13,6 @@ import javax.swing.UIManager;
 
 import core.Joueur;
 import core.Partie;
-import ui.components.JAttaque;
 import ui.components.JCarte;
 import ui.components.JoueurCellRenderer;
 
