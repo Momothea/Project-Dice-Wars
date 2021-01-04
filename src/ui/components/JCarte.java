@@ -6,12 +6,15 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import core.Carte;
+import core.InvalidMoveException;
 import core.Joueur;
 import core.Territoire;
 
@@ -30,6 +33,7 @@ public class JCarte extends JPanel {
 	private JPanel gCarte; // panel contenant la représentation graphique de la carte
 	private JAttaque statusAttaque; // panel contenant les informations sur l'attaque en cours
 	private Territoire tAttaquant;
+	private Joueur jAttaquant;
 
 	public JCarte(Carte carte) {
 		setLayout(new BorderLayout());
@@ -73,6 +77,10 @@ public class JCarte extends JPanel {
 		statusAttaque = new JAttaque();
 		add(statusAttaque, BorderLayout.SOUTH);
 	}
+	
+	public void setjAttaquant(Joueur jAttaquant) {
+		this.jAttaquant = jAttaquant; // le rendre immutable ? N
+	}
 
 	public void joueurAttaque(Territoire terrSelectionne) {
 		// force repaint
@@ -84,8 +92,14 @@ public class JCarte extends JPanel {
 		} else {
 			System.out.printf("Attaque Terr %d contre Terr %d\n", tAttaquant.getId(), terrSelectionne.getId());
 			terrSelectionne.setSelected(true);
-			// TODO lancer fct attaque ici !!
-			statusAttaque.showAttaque(tAttaquant, terrSelectionne);
+			
+			try {
+				Map<String, ArrayList<Integer>> desAttaque = jAttaquant.attaquerTerritoire(tAttaquant, terrSelectionne);
+				statusAttaque.showAttaque(tAttaquant, terrSelectionne, desAttaque);
+			} catch (InvalidMoveException e) {
+				String msgErreur = e.getMessage();
+				System.err.println(msgErreur);
+			}
 
 			// remettre à 0 les territoires selectionnes
 			tAttaquant.setSelected(false);

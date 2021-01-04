@@ -1,7 +1,6 @@
 package ui.components;
 
 import javax.swing.JPanel;
-import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import core.Joueur;
@@ -11,8 +10,9 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.Map;
 
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import java.awt.FlowLayout;
 import javax.swing.SwingConstants;
@@ -88,22 +88,24 @@ public class JAttaque extends JPanel {
 		((CardLayout) this.getLayout()).show(this, cardErrorID);
 	}
 
-	public void showAttaque(Territoire terrAttaquant, Territoire terrAttaque) {
-
+	public void showAttaque(Territoire terrAttaquant, Territoire terrAttaque, Map<String, ArrayList<Integer>> desAttaque) {
+		ArrayList<Integer> desAttaquant = desAttaque.get("attaquant");
+		ArrayList<Integer> desAttaquee = desAttaque.get("attaquee");
+		
 		// Set texte information territoire
 		lblAttaquant.setText(String.format("<html>"
-				+ "<p style='color: green'><strong>Terr. %d</strong> (Joueur %d)</p>" + "</html>",
-				terrAttaquant.getId(), terrAttaquant.getJoueur().getId()));
+				+ "<p style='color: green'><strong>Terr. %d</strong> (Joueur %d, %d)</p>" + "</html>",
+				terrAttaquant.getId(), terrAttaquant.getJoueur().getId(), Joueur.sommeDe(desAttaquant)));
 		lblAttaquant.setHorizontalAlignment(SwingConstants.TRAILING); // aligner cet élément à droite
 		lblAttaque.setText(String.format("<html>"
-				+ "<p style='color: green'><strong>Terr. %d</strong> (Joueur %d)</p>" + "</html>",
-				terrAttaque.getId(), terrAttaque.getJoueur().getId()));
+				+ "<p style='color: green'><strong>Terr. %d</strong> (Joueur %d, %d)</p>" + "</html>",
+				terrAttaque.getId(), terrAttaque.getJoueur().getId(), Joueur.sommeDe(desAttaquee)));
 
 		/*
 		 * Ajouter les dés des joueurs ===========================
 		 */
 
-		// retirer les dés déjà présent
+		// retirer les affichages des dés déjà présent
 		dicesAttaquant.removeAll();
 		dicesAttaque.removeAll();
 
@@ -111,14 +113,14 @@ public class JAttaque extends JPanel {
 		int nbDeAttaquant = terrAttaquant.getForce();
 		Color colorAttaquant = terrAttaquant.getCouleurJoueur();
 		for (int i = 0; i < nbDeAttaquant; i++) {
-			dicesAttaquant.add(new JDice(i, colorAttaquant));
+			dicesAttaquant.add(new JDice((int) desAttaquant.get(i), colorAttaquant));
 		}
 
 		// ajout dé attaqué
 		int nbDeAttaque = terrAttaque.getForce();
 		Color colorAttaque = terrAttaque.getCouleurJoueur();
 		for (int i = 0; i < nbDeAttaque; i++) {
-			dicesAttaque.add(new JDice(i, colorAttaque));
+			dicesAttaque.add(new JDice((int) desAttaquee.get(i), colorAttaque));
 		}
 
 		// maj affichage dés
@@ -127,27 +129,6 @@ public class JAttaque extends JPanel {
 
 		// afficher Attaque
 		((CardLayout) this.getLayout()).show(this, cardAttaqueID);
-	}
-
-	public static void main(String[] args) {
-		Joueur j1 = new Joueur(1);
-		j1.setCouleur(Color.BLUE);
-		Joueur j2 = new Joueur(2);
-		j2.setCouleur(Color.RED);
-
-		Territoire t1 = new Territoire(1);
-		t1.setJoueur(j1);
-		Territoire t2 = new Territoire(2);
-		t2.setJoueur(j2);
-
-		JAttaque testAttaque = new JAttaque();
-		testAttaque.showAttaque(t1, t2);
-		JFrame frame = new JFrame();
-		frame.setTitle("Test Attaque");
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.getContentPane().add(testAttaque);
-		frame.pack();
-		frame.setVisible(true);
 	}
 
 }

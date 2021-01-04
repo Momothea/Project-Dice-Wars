@@ -59,7 +59,7 @@ public class Joueur {
 						+ "<p style='padding-left: 10px'>Nb terr: %d<small>/%d</small> (%d %%)</p>" + "</html>",
 				id, listeTerritoire.size(), nbTerritoire, (listeTerritoire.size() * 100) / nbTerritoire);
 	}
-	
+
 	/*
 	 * Gestion attaque
 	 */
@@ -68,33 +68,35 @@ public class Joueur {
 		for (int i = 0; i < nbDes; i++) {
 			Random nb_aleat = new Random();
 			int faceDe = nb_aleat.nextInt(6) + 1;
-			des.set(i, faceDe);
+			des.add(faceDe);
 		}
 		return des;
 	}
-	
+
 	// https://stackoverflow.com/a/49917501
-	private static int sommeDe(ArrayList<Integer> des) {
+	public static int sommeDe(ArrayList<Integer> des) {
 		return des.stream().mapToInt(de -> de).sum();
 	}
 
-	public void attaquerTerritoire(Territoire tAttaquant, Territoire tAttaquee) throws InvalidMoveException {
+	public Map<String, ArrayList<Integer>> attaquerTerritoire(Territoire tAttaquant, Territoire tAttaquee)
+			throws InvalidMoveException {
 		/*
 		 * Vérifications =============
 		 */
-		// tAttaquant a plus de 1 dés
-		if (tAttaquant.getForce() <= 1) {
-			throw new InvalidMoveException(String.format("Ne peut étendre Terr. %d (1 dé)", tAttaquant.getId()));
-		}
 
 		// tAttaquant n'appartient pas à ce joueur
-		if (tAttaquant.getJoueur().getId() != getId()) {
+		if (tAttaquant.getJoueur().getId() != id) {
 			throw new InvalidMoveException(String.format("Terr. %d ne vous appartient pas !", tAttaquant.getId()));
 		}
 
 		// tAttaquee est déjà à ce joueur
-		if (tAttaquee.getJoueur().getId() == getId()) {
+		if (tAttaquee.getJoueur().getId() == id) {
 			throw new InvalidMoveException(String.format("Terr. %d vous appartient déjà", tAttaquee.getId()));
+		}
+
+		// tAttaquant a plus de 1 dés
+		if (tAttaquant.getForce() <= 1) {
+			throw new InvalidMoveException(String.format("Ne peut étendre Terr. %d (1 dé)", tAttaquant.getId()));
 		}
 
 		// tAttaquee est bien voisin de tAttaquant
@@ -113,12 +115,11 @@ public class Joueur {
 		// lancer dé attaquee
 		int nbDeAttaquee = tAttaquee.getForce();
 		ArrayList<Integer> desAttaquee = Joueur.lanceDe(nbDeAttaquee);
-		
+
 		/*
-		 * Résultat attaque
-		 * ================
+		 * Résultat attaque ================
 		 */
-		if(Joueur.sommeDe(desAttaquant) > Joueur.sommeDe(desAttaquee)) {
+		if (Joueur.sommeDe(desAttaquant) > Joueur.sommeDe(desAttaquee)) {
 			// Victoire
 			System.out.println("Victoire");
 		} else {
@@ -126,6 +127,11 @@ public class Joueur {
 			System.out.println("Défaite");
 		}
 
+		// retourner les dés de l'attaque
+		Map<String, ArrayList<Integer>> des = new HashMap<>();
+		des.put("attaquant", desAttaquant);
+		des.put("attaquee", desAttaquee);
+		return Collections.unmodifiableMap(des);
 	}
 
 	public void terminerTour() {

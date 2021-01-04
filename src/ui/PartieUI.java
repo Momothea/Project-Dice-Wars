@@ -29,7 +29,10 @@ import java.awt.geom.AffineTransform;
 
 public class PartieUI {
 	private JFrame frame;
+	
+	private JCarte pnlCarte;
 	private JPanel infoTour;
+	
 	private JLabel lblInfoTour; // affichage nb Tour
 	private JList<Joueur> lstTourJoueur; // affichage joueur qui doit joueur
 
@@ -60,6 +63,7 @@ public class PartieUI {
 
 		initialize();
 		setTourJoueur(0);
+		pnlCarte.setjAttaquant(partie.getJoueurs()[partie.getiJoueurTour()]);
 	}
 
 	public void setTourJoueur(int index) {
@@ -151,7 +155,7 @@ public class PartieUI {
 		 * Ajouter JCarte ==============
 		 */
 
-		JCarte pnlCarte = new JCarte(partie.getCarte());
+		pnlCarte = new JCarte(partie.getCarte());
 		frame.getContentPane().add(pnlCarte, BorderLayout.CENTER);
 
 		/*
