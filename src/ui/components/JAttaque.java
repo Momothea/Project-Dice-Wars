@@ -88,17 +88,26 @@ public class JAttaque extends JPanel {
 		((CardLayout) this.getLayout()).show(this, cardErrorID);
 	}
 
-	public void showAttaque(Territoire terrAttaquant, Territoire terrAttaque, Map<String, ArrayList<Integer>> desAttaque) {
+	public void showError(String msg) {
+		lblErreur.setText(String.format("<html>" + "<h2 style='margin: 0.5em 0; color: red'>Mouvement invalide</h2>"
+				+ "<p style='color: red'>%s</p>" + "</html>", msg));
+
+		// afficher Error
+		((CardLayout) this.getLayout()).show(this, cardErrorID);
+	}
+
+	public void showAttaque(Territoire terrAttaquant, Territoire terrAttaque,
+			Map<String, ArrayList<Integer>> desAttaque) {
 		ArrayList<Integer> desAttaquant = desAttaque.get("attaquant");
 		ArrayList<Integer> desAttaquee = desAttaque.get("attaquee");
-		
+
 		// Set texte information territoire
-		lblAttaquant.setText(String.format("<html>"
-				+ "<p style='color: green'><strong>Terr. %d</strong> (Joueur %d, %d)</p>" + "</html>",
+		lblAttaquant.setText(String.format(
+				"<html>" + "<p style='color: green'><strong>Terr. %d</strong> (Joueur %d, %d)</p>" + "</html>",
 				terrAttaquant.getId(), terrAttaquant.getJoueur().getId(), Joueur.sommeDe(desAttaquant)));
 		lblAttaquant.setHorizontalAlignment(SwingConstants.TRAILING); // aligner cet élément à droite
-		lblAttaque.setText(String.format("<html>"
-				+ "<p style='color: green'><strong>Terr. %d</strong> (Joueur %d, %d)</p>" + "</html>",
+		lblAttaque.setText(String.format(
+				"<html>" + "<p style='color: green'><strong>Terr. %d</strong> (Joueur %d, %d)</p>" + "</html>",
 				terrAttaque.getId(), terrAttaque.getJoueur().getId(), Joueur.sommeDe(desAttaquee)));
 
 		/*

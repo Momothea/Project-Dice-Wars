@@ -98,7 +98,7 @@ public class JCarte extends JPanel {
 				statusAttaque.showAttaque(tAttaquant, terrSelectionne, desAttaque);
 			} catch (InvalidMoveException e) {
 				String msgErreur = e.getMessage();
-				System.err.println(msgErreur);
+				statusAttaque.showError(msgErreur);
 			}
 
 			// remettre à 0 les territoires selectionnes
