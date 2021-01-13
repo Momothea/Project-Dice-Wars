@@ -1,6 +1,7 @@
 package core;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,7 +10,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 
-public class Carte {
+public class Carte implements Serializable {
 	private int nbJoueurs;
 	private int nbTerritoire;
 	private ArrayList<Territoire> territoires;

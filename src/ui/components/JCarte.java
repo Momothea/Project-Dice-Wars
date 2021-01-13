@@ -6,8 +6,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Map;
+
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,7 +17,7 @@ import core.InvalidMoveException;
 import core.Joueur;
 import core.Territoire;
 
-public class JCarte extends JPanel {
+public class JCarte extends JPanel implements Serializable {
 	// https://stackoverflow.com/questions/44012684/how-to-make-hexagonal-jbuttons
 	// REMOVE "magic" number from StackOverflow answer
 
