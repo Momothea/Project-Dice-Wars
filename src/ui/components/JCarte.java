@@ -42,7 +42,7 @@ public class JCarte extends JPanel implements Serializable {
 		initGUI(carte);
 	}
 
-	public void initGUI(Carte carte) {
+	public void initGUI(Carte carte) {	
 		Territoire[][] matCarte = carte.getCarte();
 
 		/*
@@ -154,6 +154,7 @@ public class JCarte extends JPanel implements Serializable {
 		System.out.println(map);
 
 		JCarte hexPattern = new JCarte(map);
+		hexPattern.setjAttaquant(joueurs[0]);
 		JFrame frame = new JFrame();
 		frame.setTitle("Hexagon Pattern");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

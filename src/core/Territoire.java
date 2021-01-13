@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Territoire implements Serializable {
+	private static final long serialVersionUID = -7293972875499218379L;
+	
 	private long id;
 	private Joueur joueur;
 	private int force;

@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Random;
 
 public class Carte implements Serializable {
+	private static final long serialVersionUID = 3489345836813193945L;
+	
 	private int nbJoueurs;
 	private int nbTerritoire;
 	private ArrayList<Territoire> territoires;

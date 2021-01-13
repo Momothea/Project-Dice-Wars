@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Joueur implements Serializable {
+	private static final long serialVersionUID = -1521119721287633385L;
+	
 	private long id;
 	private Color couleur;
 	private List<Territoire> listeTerritoire = new ArrayList<>();

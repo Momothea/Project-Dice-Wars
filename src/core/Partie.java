@@ -4,14 +4,16 @@ import java.awt.Color;
 import java.io.*;
 
 public class Partie implements Serializable {
+	private static final long serialVersionUID = -1377212323714822327L;
+	
 	private Joueur[] joueurs;
 	private Carte carte;
 
 	private int nbTour = 0;
-	private int iJoueurTour = 0; // indice du joueur qui doit jouer
+	private Joueur jAttaquant; // joueur qui doit jouer
 	
 	public Partie(int nbJoueurs) {
-		Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK, Color.CYAN, Color.MAGENTA, Color.RED, Color.YELLOW };
+		Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK, Color.CYAN, Color.MAGENTA, Color.RED, Color.YELLOW, Color.WHITE };
 		this.joueurs = new Joueur[nbJoueurs];
 		
 		// Création joueur
@@ -37,52 +39,75 @@ public class Partie implements Serializable {
 		return nbTour;
 	}
 
-	public int getiJoueurTour() {
-		return iJoueurTour;
+	public Joueur getjAttaquant() {
+		return jAttaquant;
 	}
-	public void serializePartie(Partie partie) throws FileNotFoundException, IOException {
+
+	public void setjAttaquant(Joueur jAttaquant) {
+		this.jAttaquant = jAttaquant;
+	}
+	
+	/*
+	 * SERIALISATION
+	 * =============
+	 */
+
+	public void serialize(String filename) throws FileNotFoundException, IOException {
 		ObjectOutputStream oos = null;
 		try {
-			final FileOutputStream fichier = new FileOutputStream("partie.ser");
+			// créer le fichier et écrire la partie
+			final FileOutputStream fichier = new FileOutputStream(filename);
 			oos = new ObjectOutputStream(fichier);
-			oos.writeObject(partie);
+			oos.writeObject(this);
 			oos.flush();
 		}
-		catch(FileNotFoundException e){
-			e.printStackTrace();
+		catch(FileNotFoundException e) {
+			// e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
-		catch(IOException e){
-			e.printStackTrace();
+		catch(IOException e) {
+			// e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		finally {
-			try{
+			try {
 				if(oos!= null){
-					oos.flush();
+					oos.flush(); // tu n'a pas déjà plus en haut
 					oos.close();
 				}
-			}   catch( final IOException e){
+			}   catch(final IOException e) {
 				e.printStackTrace();
 			}
 		}
 
 	}
 
-
-	public Partie desriliaze(String partie) throws ClassNotFoundException, IOException{
-		FileInputStream fis = new FileInputStream(partie);
-		try{
-			ObjectInputStream ois = new ObjectInputStream(fis);
-			try{
-				Partie resultat = (Partie) ois.readObject();
-				return resultat;
-			} finally {
-				ois.close();
-			}
-		}finally {
-			fis.close();
+	// deserialisation
+	public Partie(String filename) throws ClassNotFoundException, IOException {
+		FileInputStream fis = null;
+		ObjectInputStream ois = null;
+		
+		try {
+			// lecture fichier et lecture objet
+			fis = new FileInputStream(filename);			
+			ois = new ObjectInputStream(fis);
+			
+			Partie resultat = (Partie) ois.readObject();
+			
+			// import objet
+			this.carte = resultat.carte;
+			this.jAttaquant = resultat.jAttaquant;
+			this.joueurs = resultat.joueurs;
+			this.nbTour = resultat.nbTour;
+		} 
+		catch(Exception e) {
+			System.err.println(e.getMessage());
 		}
+		finally {
+				ois.close();
+				fis.close();
+		}	
 
 	}
-	
 	
 }
