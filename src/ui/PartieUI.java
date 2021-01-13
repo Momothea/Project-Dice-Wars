@@ -13,7 +13,6 @@ import javax.swing.UIManager;
 
 import core.Joueur;
 import core.Partie;
-import ui.components.JAttaque;
 import ui.components.JCarte;
 import ui.components.JoueurCellRenderer;
 
@@ -32,7 +31,10 @@ import java.io.*;
 public class PartieUI implements Serializable {
 	private static final long serialVersionUID =1350092881346723535L;
 	private JFrame frame;
+	
+	private JCarte pnlCarte;
 	private JPanel infoTour;
+	
 	private JLabel lblInfoTour; // affichage nb Tour
 	private JList<Joueur> lstTourJoueur; // affichage joueur qui doit joueur
 
@@ -77,6 +79,7 @@ public class PartieUI implements Serializable {
 
 		initialize();
 		setTourJoueur(0);
+		pnlCarte.setjAttaquant(partie.getJoueurs()[partie.getiJoueurTour()]);
 	}
 
 	public void setTourJoueur(int index) {
@@ -168,7 +171,7 @@ public class PartieUI implements Serializable {
 		 * Ajouter JCarte ==============
 		 */
 
-		JCarte pnlCarte = new JCarte(partie.getCarte());
+		pnlCarte = new JCarte(partie.getCarte());
 		frame.getContentPane().add(pnlCarte, BorderLayout.CENTER);
 
 		/*
