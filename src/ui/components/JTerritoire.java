@@ -5,9 +5,10 @@ import javax.swing.*;
 
 import core.Territoire;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class JTerritoire extends JButton {
+public class JTerritoire extends JButton implements Serializable {
 	private static final long serialVersionUID = -5763113073933373564L;
 	private int mCurrentSize = 0;
 	private Font mInitialFont = null;

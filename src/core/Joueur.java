@@ -1,9 +1,10 @@
 package core;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.*;
 
-public class Joueur {
+public class Joueur implements Serializable {
 	private long id;
 	private Color couleur;
 	private Set<Territoire> listeTerritoire = new HashSet<>();

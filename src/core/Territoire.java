@@ -1,9 +1,10 @@
 package core;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.*;
 
-public class Territoire {
+public class Territoire implements Serializable {
 	private long id;
 	private Joueur joueur;
 	private int force;

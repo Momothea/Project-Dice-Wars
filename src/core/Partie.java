@@ -1,8 +1,9 @@
 package core;
 
 import java.awt.Color;
+import java.io.*;
 
-public class Partie {
+public class Partie implements Serializable {
 	private Joueur[] joueurs;
 	private Carte carte;
 
@@ -38,6 +39,49 @@ public class Partie {
 
 	public int getiJoueurTour() {
 		return iJoueurTour;
+	}
+	public void serializePartie(Partie partie) throws FileNotFoundException, IOException {
+		ObjectOutputStream oos = null;
+		try {
+			final FileOutputStream fichier = new FileOutputStream("partie.ser");
+			oos = new ObjectOutputStream(fichier);
+			oos.writeObject(partie);
+			oos.flush();
+		}
+		catch(FileNotFoundException e){
+			e.printStackTrace();
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+		finally {
+			try{
+				if(oos!= null){
+					oos.flush();
+					oos.close();
+				}
+			}   catch( final IOException e){
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+
+	public Partie desriliaze(String partie) throws ClassNotFoundException, IOException{
+		FileInputStream fis = new FileInputStream(partie);
+		try{
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			try{
+				Partie resultat = (Partie) ois.readObject();
+				return resultat;
+			} finally {
+				ois.close();
+			}
+		}finally {
+			fis.close();
+		}
+
 	}
 	
 	
