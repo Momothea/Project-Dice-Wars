@@ -26,8 +26,10 @@ import java.awt.FlowLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.AffineTransform;
+import java.io.*;
 
-public class PartieUI {
+public class PartieUI implements Serializable {
+	private static final long serialVersionUID =1350092881346723535L;
 	private JFrame frame;
 	
 	private JCarte pnlCarte;
@@ -44,12 +46,26 @@ public class PartieUI {
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				try {
+				/*try {
 					PartieUI window = new PartieUI(7);
 					window.frame.setVisible(true);
+					window.serializePartie(window);
 				} catch (Exception e) {
 					e.printStackTrace();
+				}*/
+				try{
+					PartieUI saveFile = PartieUI.desriliaze("partie.ser");
+					saveFile.frame.setVisible(true);
+
+				}catch(ClassNotFoundException | IOException e)
+				{
+					System.out.println(e.getMessage());
+				}catch (Exception e){
+					e.printStackTrace();
 				}
+
+
+
 			}
 		});
 	}
@@ -199,4 +215,49 @@ public class PartieUI {
 		});
 	}
 
-}
+	public void serializePartie(PartieUI partie) throws FileNotFoundException, IOException{
+		ObjectOutputStream oos = null;
+		try {
+			final FileOutputStream fichier = new FileOutputStream("partie.ser");
+			oos = new ObjectOutputStream(fichier);
+			oos.writeObject(partie);
+			oos.flush();
+		}
+		catch(FileNotFoundException e){
+				e.printStackTrace();
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+		finally {
+			try{
+				if(oos!= null){
+					oos.flush();
+					oos.close();
+				}
+			}   catch( final IOException e){
+				e.printStackTrace();
+			}
+		}
+
+		}
+
+
+		public static PartieUI desriliaze(String partie) throws ClassNotFoundException, IOException{
+			FileInputStream fis = new FileInputStream(partie);
+			try{
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				try{
+					PartieUI resultat = (PartieUI) ois.readObject();
+					return resultat;
+				} finally {
+					ois.close();
+				}
+			}finally {
+				fis.close();
+			}
+
+		}
+	}
+
+

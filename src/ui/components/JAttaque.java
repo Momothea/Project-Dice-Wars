@@ -15,9 +15,10 @@ import java.util.Map;
 
 import javax.swing.JLabel;
 import java.awt.FlowLayout;
+import java.io.Serializable;
 import javax.swing.SwingConstants;
 
-public class JAttaque extends JPanel {
+public class JAttaque extends JPanel implements Serializable {
 	private static final long serialVersionUID = -8978592864734150762L;
 
 	private final static String cardAttaqueID = "attaque Joueur panel";
