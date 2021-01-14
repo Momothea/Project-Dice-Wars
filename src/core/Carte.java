@@ -91,7 +91,7 @@ public class Carte implements Serializable {
 		 * Distribution des territoires aux joueurs
 		 * ========================================
 		 */
-		Joueur.setNbTerritoire(nbTerritoire);
+		Joueur.setNbTerritoireCarte(nbTerritoire);
 		
 		int nb_des_par_joueur = 5 * (nbTerritoire / nbJoueurs);
 		int[] nbDesJoueurs = new int[nbJoueurs];
@@ -297,6 +297,10 @@ public class Carte implements Serializable {
 
 	public Territoire[][] getMatriceTerritoire() {
 		return carte; // rendre plus secure
+	}
+	
+	public int getNbTerritoireCarte() {
+		return nbTerritoire;
 	}
 
 	@Override

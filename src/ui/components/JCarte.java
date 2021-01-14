@@ -101,6 +101,9 @@ public class JCarte extends JPanel {
 			tAttaquant.setSelected(false);
 			terrSelectionne.setSelected(false);
 			tAttaquant = null;
+			
+			// update la partie
+			currPartie.updatePartie();
 		}
 	}
 

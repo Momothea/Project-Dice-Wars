@@ -10,7 +10,7 @@ public class Joueur implements Serializable {
 	private long id;
 	private Color couleur;
 	private List<Territoire> listeTerritoire = new ArrayList<>();
-	private static int nbTerritoire = 1;
+	private static int nbTerritoireCarte = 1;
 
 	public Joueur(long id) {
 		this.id = id;
@@ -38,7 +38,11 @@ public class Joueur implements Serializable {
 	}
 
 	public List<Territoire> getListeTerritoire() {
-		return listeTerritoire; // rendre plus secure
+		return Collections.unmodifiableList(listeTerritoire);
+	}
+	
+	public int getNbListeTerritoire() {
+		return listeTerritoire.size();
 	}
 
 	public void addTerritoire(Territoire e) {
@@ -50,12 +54,12 @@ public class Joueur implements Serializable {
 	}
 
 
-	public static int getNbTerritoire() {
-		return nbTerritoire;
+	public static int getNbTerritoireCarte() {
+		return nbTerritoireCarte;
 	}
 
-	public static void setNbTerritoire(int nbTerritoire) {
-		Joueur.nbTerritoire = nbTerritoire;
+	public static void setNbTerritoireCarte(int nbTerritoire) {
+		Joueur.nbTerritoireCarte = nbTerritoire;
 	}
 
 	@Override
@@ -65,7 +69,7 @@ public class Joueur implements Serializable {
 		return String.format(
 				"<html>" + "<h3 style='margin: 0.5em 0'>Joueur %d</h3>"
 						+ "<p style='padding-left: 10px'>Nb terr: %d<small>/%d</small> (%d %%)</p>" + "</html>",
-				id, listeTerritoire.size(), nbTerritoire, (listeTerritoire.size() * 100) / nbTerritoire);
+				id, listeTerritoire.size(), nbTerritoireCarte, (listeTerritoire.size() * 100) / nbTerritoireCarte);
 	}
 
 	/*

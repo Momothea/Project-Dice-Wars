@@ -2,7 +2,10 @@ package core;
 
 import java.awt.Color;
 import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Partie implements Serializable {
 	private static final long serialVersionUID = -1377212323714822327L;
@@ -12,11 +15,13 @@ public class Partie implements Serializable {
 
 	private int nbTour = 0;
 	private Joueur jAttaquant; // joueur qui doit jouer
+	private Joueur gagnant;
 
 	public Partie(int nbJoueurs) {
 		Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK, Color.CYAN, Color.MAGENTA, Color.RED, Color.YELLOW,
 				Color.WHITE };
 		this.joueurs = new Joueur[nbJoueurs];
+		this.gagnant = null;
 
 		// Création joueur
 		for (int i = 0; i < nbJoueurs; i++) {
@@ -26,7 +31,7 @@ public class Partie implements Serializable {
 
 		// Création et initialisation de la carte
 		carte = new Carte(joueurs);
-		
+
 		// set tour du joueur qui aura l'honneur de démarrer les hostilités
 		setTourJoueur();
 
@@ -47,17 +52,42 @@ public class Partie implements Serializable {
 	public Joueur getjAttaquant() {
 		return jAttaquant;
 	}
-	
+
+	public Joueur getjGagnant() {
+		return gagnant;
+	}
 
 	public void setTourJoueur() {
 		// passer au tour suivant
-		Random aleat = new Random();
-		int iJoueur = aleat.nextInt(joueurs.length);
-		this.jAttaquant = joueurs[iJoueur];
-		
+		do {
+			Random aleat = new Random();
+			int iJoueur = aleat.nextInt(joueurs.length);
+			this.jAttaquant = joueurs[iJoueur];
+		} while (jAttaquant == null);
+
 		nbTour++;
 	}
-	
+
+	public synchronized void updatePartie() {
+		// supprimer les joueurs n'ayant plus de territoire
+		List<Joueur> perdants = Arrays.stream(joueurs).filter(j -> (j == null ? -1 : j.getNbListeTerritoire()) == 0)
+				.collect(Collectors.toList());
+
+		for (int i = 0; i < perdants.size(); i++) {
+			joueurs[Arrays.asList(joueurs).indexOf(perdants.get(i))] = null;
+			System.out.printf("Joueur %d retiré du jeu\n", perdants.get(i).getId());
+		}
+
+		// determiné le gagnant
+		gagnant = Arrays.stream(joueurs)
+				.filter(j -> (j == null ? -1 : j.getNbListeTerritoire()) == Joueur.getNbTerritoireCarte()).findFirst()
+				.orElse(null);
+		
+		if (gagnant != null)
+			System.out.printf("Gagnant : Joueur %d\n", gagnant.getId());
+
+		notifyAll();
+	}
 
 	/*
 	 * SERIALISATION =============
@@ -79,9 +109,9 @@ public class Partie implements Serializable {
 			// e.printStackTrace();
 			System.err.println(e.getMessage());
 		} finally {
-			fichier.close(); 
+			fichier.close();
 			oos.close();
-				
+
 		}
 
 	}
@@ -103,6 +133,8 @@ public class Partie implements Serializable {
 			this.jAttaquant = resultat.jAttaquant;
 			this.joueurs = resultat.joueurs;
 			this.nbTour = resultat.nbTour;
+			
+			Joueur.setNbTerritoireCarte(carte.getNbTerritoireCarte());
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {

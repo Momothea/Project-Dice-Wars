@@ -93,8 +93,7 @@ public class PartieUI {
 
 	public void updateTourJoueur() {
 		// update text of JList
-		//lstTourJoueur.ensureIndexIsVisible(partie.getJoueurs().length);
-		lstTourJoueur.updateUI();
+		lstTourJoueur.repaint();
 
 		// updata Tour Joueur
 		List<Joueur> listeJoueurs = Arrays.asList(partie.getJoueurs());
@@ -134,6 +133,7 @@ public class PartieUI {
 		Icon icnNew = UIManager.getIcon("FileView.fileIcon");
 		btnContainer.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		JButton btnNew = new JButton(icnNew);
+		btnNew.setToolTipText("Lancer une nouvelle partie");
 		btnNew.setPreferredSize(dimBtn);
 		btnNew.setText("Nouv.");
 		// menu du bouton
@@ -289,7 +289,8 @@ public class PartieUI {
 
 				// passer le tour au prochain joueur tirer aléatoirement
 				partie.setTourJoueur();
-				
+				// update Tour Joueur
+				updateTourJoueur();
 
 			}
 		});
@@ -324,7 +325,7 @@ public class PartieUI {
 				// Runs outside of the Swing UI thread
 				new Thread(new Runnable() {
 					public void run() {
-						while (true) {
+						while (partie.getjGagnant() == null) {
 
 							// Runs inside of the Swing UI thread
 							// https://stackabuse.com/how-to-use-threads-in-java-swing/
@@ -341,6 +342,10 @@ public class PartieUI {
 								e.printStackTrace();
 							}
 						}
+
+						// arriver ici, on a un gagnant
+						JOptionPane.showMessageDialog(frame, String.format(
+								"Victoire de Joueur %d", partie.getjGagnant().getId()));
 					}
 				}).start();
 			}
