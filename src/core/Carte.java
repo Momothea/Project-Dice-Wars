@@ -295,7 +295,7 @@ public class Carte implements Serializable {
 		}
 	}
 
-	public Territoire[][] getCarte() {
+	public Territoire[][] getMatriceTerritoire() {
 		return carte; // rendre plus secure
 	}
 

@@ -44,6 +44,10 @@ public class Joueur implements Serializable {
 	public void addTerritoire(Territoire e) {
 		listeTerritoire.add(e);
 	}
+	
+	public void removeTerritoire(Territoire e) {
+		listeTerritoire.remove(e);
+	}
 
 
 	public static int getNbTerritoire() {
@@ -83,8 +87,11 @@ public class Joueur implements Serializable {
 	}
 	
 	private void victoireAttaque(Territoire tAttaquant, Territoire tAttaquee) {
-		// Ajout territoire gagné
+		// Ajout le territoire gagné au vainqueur...
 		addTerritoire(tAttaquee);
+		// ...et le retirer au perdant
+		Joueur perdant = tAttaquee.getJoueur();
+		perdant.removeTerritoire(tAttaquee);
 		
 		// déplacer tout ses dés sur le territoire conquis sauf 1...
 		int nbDeAttaquant = tAttaquant.getForce();
@@ -161,8 +168,42 @@ public class Joueur implements Serializable {
 		return Collections.unmodifiableMap(des);
 	}
 
-	public void terminerTour() {
+	public int terminerTour() {
+		Random rand = new Random();
+		// ajouté un moyen de trouver le plus grand territoire contigu
 
+		int nbAttribution = Territoire.maxTContigu(listeTerritoire);
+		System.out.printf("Nb terr en plus: %d\n", nbAttribution);
+
+		HashSet<Long> forcemax = new HashSet<Long>();
+		// on ajoute un dé par territoire connexe de taille max.
+		while (nbAttribution > 0) {
+			// break si tout les territoire possédés on atteint la force max
+			if (forcemax.size() == listeTerritoire.size()) {
+				break;
+			}
+			// choix aléatoire du territoire à booster, recommence tant que le terriroire
+			// choisit n'est pas valide
+			int idT;
+			do {
+				idT = rand.nextInt(listeTerritoire.size());
+			} while (forcemax.contains(listeTerritoire.get(idT).getId()));
+
+			// augmentation de la force du territoire
+			// ou
+			// ajout à la liste des territoire de force max
+
+			Territoire forceUp = listeTerritoire.get(idT);
+			if (forceUp.getForce() < 8) {
+				forceUp.setForce(forceUp.getForce() + 1);
+				System.out.println("la force du territoire " + forceUp.getId() + " est passé à " + forceUp.getForce());
+				nbAttribution--;
+			} else {
+				forcemax.add(forceUp.getId());
+			}
+		}
+		
+		return nbAttribution;
 	}
 
 }

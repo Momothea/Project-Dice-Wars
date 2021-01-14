@@ -14,7 +14,8 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -30,6 +31,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import core.Joueur;
@@ -37,8 +39,7 @@ import core.Partie;
 import ui.components.JCarte;
 import ui.components.JoueurCellRenderer;
 
-public class PartieUI implements Serializable {
-	private static final long serialVersionUID = 1350092881346723535L;
+public class PartieUI {
 	private JFrame frame;
 
 	private JCarte pnlCarte;
@@ -55,12 +56,6 @@ public class PartieUI implements Serializable {
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-
-				/*
-				 * try { PartieUI window = new PartieUI(7); window.frame.setVisible(true);
-				 * window.serializePartie(window); } catch (Exception e) { e.printStackTrace();
-				 * }
-				 */
 
 				try {
 					PartieUI window = new PartieUI(7);
@@ -90,12 +85,24 @@ public class PartieUI implements Serializable {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		initialize();
-		setTourJoueur(0);
-		pnlCarte.setjAttaquant(partie.getJoueurs()[0]);
 	}
 
-	public void setTourJoueur(int index) {
-		lstTourJoueur.setSelectedIndex(index);
+	/*
+	 * UPDATES
+	 */
+
+	public void updateTourJoueur() {
+		// update text of JList
+		//lstTourJoueur.ensureIndexIsVisible(partie.getJoueurs().length);
+		lstTourJoueur.updateUI();
+
+		// updata Tour Joueur
+		List<Joueur> listeJoueurs = Arrays.asList(partie.getJoueurs());
+		Joueur jAttaquant = partie.getjAttaquant();
+		lstTourJoueur.setSelectedIndex(listeJoueurs.indexOf(jAttaquant));
+
+		// update NbTour
+		lblInfoTour.setText(String.format("<html><h2>Tour: %d</h3></html>", partie.getNbTour()));
 	}
 
 	public void resetGUI() {
@@ -132,32 +139,31 @@ public class PartieUI implements Serializable {
 		// menu du bouton
 		// (https://stackoverflow.com/questions/1692677/how-to-create-a-jbutton-with-a-menu#1693326)
 		JPopupMenu menuNew = new JPopupMenu();
-		menuNew.add(new JMenuItem(new AbstractAction("Nouvelle partie") {
+
+		// ajout item nouvelle partie
+		JMenuItem newEmptyPartie = new JMenuItem(new AbstractAction("Nouvelle partie") {
 			private static final long serialVersionUID = -2602975436374531482L;
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Choix dialogue nb Joueur
 				Integer[] possibilities = { 2, 3, 4, 5, 6, 7, 8 };
-
 				// Afficher dialogue nb Joueur
 				int nbJoueur = -1;
 				try {
 					nbJoueur = (int) JOptionPane.showInputDialog(frame, "Nombre de joueurs",
 							"DiceWars - Nouvelle partie", JOptionPane.QUESTION_MESSAGE, null, possibilities, 7);
-
 				} catch (Exception e1) {
 					nbJoueur = -1;
 				}
-
 				// Si l'user n'a pas cancel, reset la GUI et charger la nouvelle partie
 				if (nbJoueur != -1) {
 					PartieUI.this.partie = new Partie(nbJoueur);
 					PartieUI.this.resetGUI();
 				}
-
 			}
-		}));
+		});
+		menuNew.add(newEmptyPartie);
 		// ajout du menu pop up au bouton
 		btnNew.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -266,19 +272,35 @@ public class PartieUI implements Serializable {
 		lstTourJoueur.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		lstTourJoueur.setCellRenderer(new JoueurCellRenderer<Joueur>());
 		lstTourJoueur.setEnabled(false);
+		updateTourJoueur();
 
 		JScrollPane listScrollPane = new JScrollPane(lstTourJoueur);
 		infoTour.add(listScrollPane, BorderLayout.CENTER);
 
 		// Ajouter bouton fin Tour
 		JButton btnFinTour = new JButton("Fin Tour >>");
+		btnFinTour.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Fin tour");
+				partie.getjAttaquant().terminerTour();
+				// update carte
+				pnlCarte.repaint();
+
+				// passer le tour au prochain joueur tirer aléatoirement
+				partie.setTourJoueur();
+				
+
+			}
+		});
+		// ajout du bouton à infoTour
 		infoTour.add(btnFinTour, BorderLayout.SOUTH);
 
 		/*
 		 * Ajouter JCarte ==============
 		 */
 
-		pnlCarte = new JCarte(partie.getCarte());
+		pnlCarte = new JCarte(partie);
 		frame.getContentPane().add(pnlCarte, BorderLayout.CENTER);
 
 		/*
@@ -292,11 +314,35 @@ public class PartieUI implements Serializable {
 
 				// Get new size
 				Dimension newSize = c.getSize();
-				int cWidth = Math.max(125, (int) Math.round(0.15 * newSize.getWidth()));
+				int cWidth = Math.max(130, (int) Math.round(0.15 * newSize.getWidth()));
 
 				newSize.setSize(cWidth, -1);
 
 				infoTour.setPreferredSize(newSize);
+
+				// lancer le thread qui update infoTour
+				// Runs outside of the Swing UI thread
+				new Thread(new Runnable() {
+					public void run() {
+						while (true) {
+
+							// Runs inside of the Swing UI thread
+							// https://stackabuse.com/how-to-use-threads-in-java-swing/
+							SwingUtilities.invokeLater(new Runnable() {
+								public void run() {
+									// update infoTour
+									updateTourJoueur();
+								}
+							});
+
+							try {
+								java.lang.Thread.sleep(20);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				}).start();
 			}
 
 			@Override
@@ -305,7 +351,7 @@ public class PartieUI implements Serializable {
 
 				// Get new size
 				Dimension newSize = c.getSize();
-				int cWidth = Math.max(125, (int) Math.round(0.15 * newSize.getWidth()));
+				int cWidth = Math.max(130, (int) Math.round(0.15 * newSize.getWidth()));
 
 				newSize.setSize(cWidth, -1);
 

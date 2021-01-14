@@ -1,14 +1,24 @@
 package ui.components;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.ButtonModel;
+import javax.swing.JButton;
 
 import core.Territoire;
 
-import java.io.Serializable;
-import java.util.*;
-
-public class JTerritoire extends JButton implements Serializable {
+public class JTerritoire extends JButton {
 	private static final long serialVersionUID = -5763113073933373564L;
 	private int mCurrentSize = 0;
 	private Font mInitialFont = null;
@@ -28,11 +38,11 @@ public class JTerritoire extends JButton implements Serializable {
 		setMargin(new Insets(0, 0, 0, 0));
 
 		// set infobulle
-		setToolTipText(String.format(
+		/*setToolTipText(String.format(
 				"<html>" + "<p><strong>id     :</strong> %d (%s)</p>" + "<p><strong>force   :</strong> %d</p>"
 						+ "<p><strong>Joueur  :</strong> %d</p>" + "<p><strong>voisins :</strong> %s</p>" + "</html>",
 				territoire.getId(), territoire , territoire.getForce(), territoire.getJoueur().getId(),
-				territoire.getVoisins().toString()));
+				territoire.getVoisins().toString()));*/
 	}
 
 	public boolean isSelected() {
@@ -102,6 +112,12 @@ public class JTerritoire extends JButton implements Serializable {
 		}
 
 		super.paintComponent(graphics);
+		
+		setToolTipText(String.format(
+				"<html>" + "<p><strong>id     :</strong> %d (%s)</p>" + "<p><strong>force   :</strong> %d</p>"
+						+ "<p><strong>Joueur  :</strong> %d</p>" + "<p><strong>voisins :</strong> %s</p>" + "</html>",
+				territoire.getId(), territoire , territoire.getForce(), territoire.getJoueur().getId(),
+				territoire.getVoisins().toString()));
 	}
 
 	@Override

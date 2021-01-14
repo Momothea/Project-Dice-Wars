@@ -1,26 +1,20 @@
 package ui.components;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.WindowConstants;
 
-import core.Carte;
 import core.InvalidMoveException;
-import core.Joueur;
+import core.Partie;
 import core.Territoire;
 
-public class JCarte extends JPanel implements Serializable {
+public class JCarte extends JPanel {
 	// https://stackoverflow.com/questions/44012684/how-to-make-hexagonal-jbuttons
 	// REMOVE "magic" number from StackOverflow answer
 
@@ -35,15 +29,18 @@ public class JCarte extends JPanel implements Serializable {
 	private JPanel gCarte; // panel contenant la représentation graphique de la carte
 	private JAttaque statusAttaque; // panel contenant les informations sur l'attaque en cours
 	private Territoire tAttaquant;
-	private Joueur jAttaquant;
+	// private Joueur jAttaquant;
+	private Partie currPartie;
 
-	public JCarte(Carte carte) {
+	public JCarte(Partie partie) {
+		this.currPartie = partie;
+
 		setLayout(new BorderLayout());
-		initGUI(carte);
+		initGUI();
 	}
 
-	public void initGUI(Carte carte) {	
-		Territoire[][] matCarte = carte.getCarte();
+	protected void initGUI() {
+		Territoire[][] matCarte = currPartie.getCarte().getMatriceTerritoire();
 
 		/*
 		 * Composant carte ===============
@@ -57,7 +54,7 @@ public class JCarte extends JPanel implements Serializable {
 			for (int col = 0; col < COLUMNS; col++) {
 				if (matCarte[row][col] != null) {
 					carteTerritoires[row][col] = new JTerritoire(matCarte[row][col],
-							carte.getTerrainsVoisins(row, col));
+							currPartie.getCarte().getTerrainsVoisins(row, col));
 					carteTerritoires[row][col].addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -79,10 +76,6 @@ public class JCarte extends JPanel implements Serializable {
 		statusAttaque = new JAttaque();
 		add(statusAttaque, BorderLayout.SOUTH);
 	}
-	
-	public void setjAttaquant(Joueur jAttaquant) {
-		this.jAttaquant = jAttaquant; // le rendre immutable ? N
-	}
 
 	public void joueurAttaque(Territoire terrSelectionne) {
 		// force repaint
@@ -94,9 +87,10 @@ public class JCarte extends JPanel implements Serializable {
 		} else {
 			System.out.printf("Attaque Terr %d contre Terr %d\n", tAttaquant.getId(), terrSelectionne.getId());
 			terrSelectionne.setSelected(true);
-			
+
 			try {
-				Map<String, ArrayList<Integer>> desAttaque = jAttaquant.attaquerTerritoire(tAttaquant, terrSelectionne);
+				Map<String, ArrayList<Integer>> desAttaque = currPartie.getjAttaquant().attaquerTerritoire(tAttaquant,
+						terrSelectionne);
 				statusAttaque.showAttaque(tAttaquant, terrSelectionne, desAttaque);
 			} catch (InvalidMoveException e) {
 				String msgErreur = e.getMessage();
@@ -141,25 +135,18 @@ public class JCarte extends JPanel implements Serializable {
 	}
 
 	public static void main(String[] args) {
-		int nbJoueurs = 7;
-		Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK, Color.CYAN, Color.MAGENTA, Color.RED, Color.YELLOW };
-		Joueur[] joueurs = new Joueur[nbJoueurs];
-		System.out.println("Création joueurs...");
-		for (int i = 0; i < nbJoueurs; i++) {
-			Joueur newJoueur = new Joueur(i + 1, colors[i]);
-			joueurs[i] = newJoueur;
-		}
-		System.out.println("Création carte...");
-		Carte map = new Carte(joueurs);
-		System.out.println(map);
-
-		JCarte hexPattern = new JCarte(map);
-		hexPattern.setjAttaquant(joueurs[0]);
-		JFrame frame = new JFrame();
-		frame.setTitle("Hexagon Pattern");
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.getContentPane().add(hexPattern);
-		frame.pack();
-		frame.setVisible(true);
+		/*
+		 * int nbJoueurs = 7; Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK,
+		 * Color.CYAN, Color.MAGENTA, Color.RED, Color.YELLOW }; Joueur[] joueurs = new
+		 * Joueur[nbJoueurs]; System.out.println("Création joueurs..."); for (int i = 0;
+		 * i < nbJoueurs; i++) { Joueur newJoueur = new Joueur(i + 1, colors[i]);
+		 * joueurs[i] = newJoueur; } System.out.println("Création carte..."); Carte map
+		 * = new Carte(joueurs); System.out.println(map);
+		 * 
+		 * JCarte hexPattern = new JCarte(map); hexPattern.setjAttaquant(joueurs[0]);
+		 * JFrame frame = new JFrame(); frame.setTitle("Hexagon Pattern");
+		 * frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		 * frame.getContentPane().add(hexPattern); frame.pack(); frame.setVisible(true);
+		 */
 	}
 }
