@@ -2,27 +2,39 @@ package core;
 
 import java.awt.Color;
 import java.io.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Partie implements Serializable {
+	private static final long serialVersionUID = -1377212323714822327L;
+
 	private Joueur[] joueurs;
 	private Carte carte;
 
 	private int nbTour = 0;
-	private int iJoueurTour = 0; // indice du joueur qui doit jouer
-	
+	private Joueur jAttaquant; // joueur qui doit jouer
+	private Joueur gagnant;
+
 	public Partie(int nbJoueurs) {
-		Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK, Color.CYAN, Color.MAGENTA, Color.RED, Color.YELLOW };
+		Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK, Color.CYAN, Color.MAGENTA, Color.RED, Color.YELLOW,
+				Color.WHITE };
 		this.joueurs = new Joueur[nbJoueurs];
-		
+		this.gagnant = null;
+
 		// Création joueur
 		for (int i = 0; i < nbJoueurs; i++) {
 			Joueur newJoueur = new Joueur(i + 1, colors[i]);
 			joueurs[i] = newJoueur;
 		}
-		
+
 		// Création et initialisation de la carte
 		carte = new Carte(joueurs);
-		
+
+		// set tour du joueur qui aura l'honneur de démarrer les hostilités
+		setTourJoueur();
+
 	}
 
 	public Joueur[] getJoueurs() {
@@ -37,52 +49,99 @@ public class Partie implements Serializable {
 		return nbTour;
 	}
 
-	public int getiJoueurTour() {
-		return iJoueurTour;
+	public Joueur getjAttaquant() {
+		return jAttaquant;
 	}
-	public void serializePartie(Partie partie) throws FileNotFoundException, IOException {
+
+	public Joueur getjGagnant() {
+		return gagnant;
+	}
+
+	public void setTourJoueur() {
+		// passer au tour suivant
+		do {
+			Random aleat = new Random();
+			int iJoueur = aleat.nextInt(joueurs.length);
+			this.jAttaquant = joueurs[iJoueur];
+		} while (jAttaquant == null);
+
+		nbTour++;
+	}
+
+	public synchronized void updatePartie() {
+		// supprimer les joueurs n'ayant plus de territoire
+		List<Joueur> perdants = Arrays.stream(joueurs).filter(j -> (j == null ? -1 : j.getNbListeTerritoire()) == 0)
+				.collect(Collectors.toList());
+
+		for (int i = 0; i < perdants.size(); i++) {
+			joueurs[Arrays.asList(joueurs).indexOf(perdants.get(i))] = null;
+			System.out.printf("Joueur %d retiré du jeu\n", perdants.get(i).getId());
+		}
+
+		// determiné le gagnant
+		gagnant = Arrays.stream(joueurs)
+				.filter(j -> (j == null ? -1 : j.getNbListeTerritoire()) == Joueur.getNbTerritoireCarte()).findFirst()
+				.orElse(null);
+		
+		if (gagnant != null)
+			System.out.printf("Gagnant : Joueur %d\n", gagnant.getId());
+
+		notifyAll();
+	}
+
+	/*
+	 * SERIALISATION =============
+	 */
+
+	public void serialize(String filename) throws FileNotFoundException, IOException {
 		ObjectOutputStream oos = null;
+		FileOutputStream fichier = null;
 		try {
-			final FileOutputStream fichier = new FileOutputStream("partie.ser");
+			// créer le fichier et écrire la partie
+			fichier = new FileOutputStream(filename);
 			oos = new ObjectOutputStream(fichier);
-			oos.writeObject(partie);
+			oos.writeObject(this);
 			oos.flush();
-		}
-		catch(FileNotFoundException e){
-			e.printStackTrace();
-		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
-		finally {
-			try{
-				if(oos!= null){
-					oos.flush();
-					oos.close();
-				}
-			}   catch( final IOException e){
-				e.printStackTrace();
-			}
+		} catch (FileNotFoundException e) {
+			// e.printStackTrace();
+			System.err.println(e.getMessage());
+		} catch (IOException e) {
+			// e.printStackTrace();
+			System.err.println(e.getMessage());
+		} finally {
+			fichier.close();
+			oos.close();
+
 		}
 
 	}
 
+	// deserialisation
+	public Partie(String filename) throws ClassNotFoundException, IOException {
+		FileInputStream fis = null;
+		ObjectInputStream ois = null;
 
-	public Partie desriliaze(String partie) throws ClassNotFoundException, IOException{
-		FileInputStream fis = new FileInputStream(partie);
-		try{
-			ObjectInputStream ois = new ObjectInputStream(fis);
-			try{
-				Partie resultat = (Partie) ois.readObject();
-				return resultat;
-			} finally {
-				ois.close();
-			}
-		}finally {
+		try {
+			// lecture fichier et lecture objet
+			fis = new FileInputStream(filename);
+			ois = new ObjectInputStream(fis);
+
+			Partie resultat = (Partie) ois.readObject();
+
+			// import objet
+			this.carte = resultat.carte;
+			this.jAttaquant = resultat.jAttaquant;
+			this.joueurs = resultat.joueurs;
+			this.nbTour = resultat.nbTour;
+			
+			Joueur.setNbTerritoireCarte(carte.getNbTerritoireCarte());
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		} finally {
+			ois.close();
 			fis.close();
 		}
 
 	}
-	
-	
+
 }

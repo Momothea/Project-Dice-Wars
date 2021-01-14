@@ -2,7 +2,6 @@ package ui.components;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.io.Serializable;
 
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -10,7 +9,7 @@ import javax.swing.ListCellRenderer;
 
 import core.Joueur;
 
-public class JoueurCellRenderer<T> extends JLabel implements ListCellRenderer<T>, Serializable {
+public class JoueurCellRenderer<T> extends JLabel implements ListCellRenderer<T> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -22,7 +21,7 @@ public class JoueurCellRenderer<T> extends JLabel implements ListCellRenderer<T>
 	public Component getListCellRendererComponent(JList<? extends T> list, T value, int index,
 			boolean isSelected, boolean cellHasFocus) {
 		// taken from https://docs.oracle.com/javase/7/docs/api/javax/swing/ListCellRenderer.html
-		setText(value.toString());
+		setText((value == null ? "" : value.toString()));
 
         Color background;
         Color foreground;

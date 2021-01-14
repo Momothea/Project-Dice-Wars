@@ -15,12 +15,11 @@ import java.util.Map;
 
 import javax.swing.JLabel;
 import java.awt.FlowLayout;
-import java.io.Serializable;
 import javax.swing.SwingConstants;
 
-public class JAttaque extends JPanel implements Serializable {
-	private static final long serialVersionUID = -8978592864734150762L;
-
+public class JAttaque extends JPanel {
+	private static final long serialVersionUID = -6452048116001459318L;
+	
 	private final static String cardAttaqueID = "attaque Joueur panel";
 	private final static String cardErrorID = "error panel";
 
@@ -90,8 +89,11 @@ public class JAttaque extends JPanel implements Serializable {
 	}
 
 	public void showError(String msg) {
-		lblErreur.setText(String.format("<html>" + "<h2 style='margin: 0.5em 0; color: red'>Mouvement invalide</h2>"
-				+ "<p style='color: red'>%s</p>" + "</html>", msg));
+		lblErreur.setText(String.format("<html>"
+				+ "<h2 style='margin: 0.5em 0; text-align: center; color: red'>Mouvement invalide</h2>"
+				+ "<p style='text-align: center; color: red'>%s</p>"
+				+ "<p style='text-align: center'>Attaquer un autre territoire ou terminer votre tour</p>" + "</html>",
+				msg));
 
 		// afficher Error
 		((CardLayout) this.getLayout()).show(this, cardErrorID);

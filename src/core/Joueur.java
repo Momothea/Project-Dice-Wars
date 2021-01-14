@@ -5,10 +5,12 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Joueur implements Serializable {
+	private static final long serialVersionUID = -1521119721287633385L;
+	
 	private long id;
 	private Color couleur;
 	private List<Territoire> listeTerritoire = new ArrayList<>();
-	private static int nbTerritoire = 1;
+	private static int nbTerritoireCarte = 1;
 
 	public Joueur(long id) {
 		this.id = id;
@@ -36,20 +38,28 @@ public class Joueur implements Serializable {
 	}
 
 	public List<Territoire> getListeTerritoire() {
-		return listeTerritoire; // rendre plus secure
+		return Collections.unmodifiableList(listeTerritoire);
+	}
+	
+	public int getNbListeTerritoire() {
+		return listeTerritoire.size();
 	}
 
 	public void addTerritoire(Territoire e) {
 		listeTerritoire.add(e);
 	}
-
-
-	public static int getNbTerritoire() {
-		return nbTerritoire;
+	
+	public void removeTerritoire(Territoire e) {
+		listeTerritoire.remove(e);
 	}
 
-	public static void setNbTerritoire(int nbTerritoire) {
-		Joueur.nbTerritoire = nbTerritoire;
+
+	public static int getNbTerritoireCarte() {
+		return nbTerritoireCarte;
+	}
+
+	public static void setNbTerritoireCarte(int nbTerritoire) {
+		Joueur.nbTerritoireCarte = nbTerritoire;
 	}
 
 	@Override
@@ -59,7 +69,7 @@ public class Joueur implements Serializable {
 		return String.format(
 				"<html>" + "<h3 style='margin: 0.5em 0'>Joueur %d</h3>"
 						+ "<p style='padding-left: 10px'>Nb terr: %d<small>/%d</small> (%d %%)</p>" + "</html>",
-				id, listeTerritoire.size(), nbTerritoire, (listeTerritoire.size() * 100) / nbTerritoire);
+				id, listeTerritoire.size(), nbTerritoireCarte, (listeTerritoire.size() * 100) / nbTerritoireCarte);
 	}
 
 	/*
@@ -81,8 +91,11 @@ public class Joueur implements Serializable {
 	}
 	
 	private void victoireAttaque(Territoire tAttaquant, Territoire tAttaquee) {
-		// Ajout territoire gagné
+		// Ajout le territoire gagné au vainqueur...
 		addTerritoire(tAttaquee);
+		// ...et le retirer au perdant
+		Joueur perdant = tAttaquee.getJoueur();
+		perdant.removeTerritoire(tAttaquee);
 		
 		// déplacer tout ses dés sur le territoire conquis sauf 1...
 		int nbDeAttaquant = tAttaquant.getForce();
@@ -159,8 +172,42 @@ public class Joueur implements Serializable {
 		return Collections.unmodifiableMap(des);
 	}
 
-	public void terminerTour() {
+	public int terminerTour() {
+		Random rand = new Random();
+		// ajouté un moyen de trouver le plus grand territoire contigu
 
+		int nbAttribution = Territoire.maxTContigu(listeTerritoire);
+		System.out.printf("Nb terr en plus: %d\n", nbAttribution);
+
+		HashSet<Long> forcemax = new HashSet<Long>();
+		// on ajoute un dé par territoire connexe de taille max.
+		while (nbAttribution > 0) {
+			// break si tout les territoire possédés on atteint la force max
+			if (forcemax.size() == listeTerritoire.size()) {
+				break;
+			}
+			// choix aléatoire du territoire à booster, recommence tant que le terriroire
+			// choisit n'est pas valide
+			int idT;
+			do {
+				idT = rand.nextInt(listeTerritoire.size());
+			} while (forcemax.contains(listeTerritoire.get(idT).getId()));
+
+			// augmentation de la force du territoire
+			// ou
+			// ajout à la liste des territoire de force max
+
+			Territoire forceUp = listeTerritoire.get(idT);
+			if (forceUp.getForce() < 8) {
+				forceUp.setForce(forceUp.getForce() + 1);
+				System.out.println("la force du territoire " + forceUp.getId() + " est passé à " + forceUp.getForce());
+				nbAttribution--;
+			} else {
+				forcemax.add(forceUp.getId());
+			}
+		}
+		
+		return nbAttribution;
 	}
 
 }

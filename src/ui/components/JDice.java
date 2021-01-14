@@ -4,14 +4,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.io.Serializable;
 
 import javax.swing.*;
 
 // https://stackoverflow.com/a/2245
 // Taken from https://github.com/kdeloach/labs/blob/master/java/yahtzee/src/Dice.java
 
-public class JDice extends JComponent implements Serializable {
+public class JDice extends JComponent {
 	private static final long serialVersionUID = 4150196900779792898L;
 	
 	private Dimension arc;
