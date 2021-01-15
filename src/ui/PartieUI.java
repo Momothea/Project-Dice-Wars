@@ -33,10 +33,12 @@ import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import core.Joueur;
 import core.Partie;
 import ui.components.JCarte;
+import ui.components.JHelp;
 import ui.components.JoueurCellRenderer;
 
 public class PartieUI {
@@ -164,6 +166,43 @@ public class PartieUI {
 			}
 		});
 		menuNew.add(newEmptyPartie);
+
+		JMenuItem newCSVPartie = new JMenuItem(new AbstractAction("Importer une carte") {
+			private static final long serialVersionUID = -7459567408890983586L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Create a file chooser
+				final JFileChooser fc = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Carte DiceWars", "csv");
+				fc.setFileFilter(filter);
+				fc.setAcceptAllFileFilterUsed(false);
+
+				// In response to a button click:
+				int returnVal = fc.showOpenDialog(frame);
+
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					File file = fc.getSelectedFile();
+					String filename = file.getAbsolutePath();
+
+					// essayer d'importer la partie
+					try {
+						// Chargement de la carte
+						// TODO Put fonction here
+						// reset GUI
+						resetGUI();
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						// afficher dialogue erreur
+						JOptionPane.showMessageDialog(frame, e1.getMessage(),
+								String.format("Erreur lors de l'import de  %s", filename), JOptionPane.ERROR_MESSAGE);
+					}
+				}
+
+			}
+		});
+		menuNew.add(newCSVPartie);
+
 		// ajout du menu pop up au bouton
 		btnNew.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -182,10 +221,12 @@ public class PartieUI {
 		btnOpen.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Chargement fichier");
-
 				// Create a file chooser
 				final JFileChooser fc = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Partie DiceWars", "ser");
+				fc.setFileFilter(filter);
+				fc.setAcceptAllFileFilterUsed(false);
+				
 				// In response to a button click:
 				int returnVal = fc.showOpenDialog(frame);
 
@@ -205,9 +246,7 @@ public class PartieUI {
 						JOptionPane.showMessageDialog(frame, e1.getMessage(),
 								String.format("Erreur lors de l'import de  %s", filename), JOptionPane.ERROR_MESSAGE);
 					}
-
 				}
-
 			}
 		});
 		// ajout du bouton à la toolbar
@@ -222,16 +261,23 @@ public class PartieUI {
 		btnSave.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Sauver partie");
-
 				// Create a file chooser
 				final JFileChooser fc = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Partie DiceWars", "ser");
+				fc.setFileFilter(filter);
+				fc.setAcceptAllFileFilterUsed(false);
+				
 				// In response to a button click:
 				int returnVal = fc.showSaveDialog(frame);
 
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File file = fc.getSelectedFile();
 					String filename = file.getAbsolutePath();
+					
+					// https://stackoverflow.com/a/13308477
+					if(!filename.endsWith("ser")){
+						filename += ".ser";
+					}
 
 					// essayer de sauvegarder partie
 					try {
@@ -243,7 +289,6 @@ public class PartieUI {
 					} finally {
 						JOptionPane.showMessageDialog(frame, String.format("Partie sauvegardée dans %s", filename));
 					}
-
 				}
 			}
 		});
@@ -253,6 +298,45 @@ public class PartieUI {
 		JButton btnHelp = new JButton("Aide");
 		btnHelp.setToolTipText("Ouvrir l'aide");
 		btnHelp.setPreferredSize(dimBtn);
+		// (https://stackoverflow.com/questions/1692677/how-to-create-a-jbutton-with-a-menu#1693326)
+		JPopupMenu menuHelp = new JPopupMenu();
+
+		// ajout afficher aide
+		JMenuItem helpGetHelp = new JMenuItem(new AbstractAction("Afficher l'aide") {
+			private static final long serialVersionUID = 6986764940894683323L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new JHelp(frame.getBounds());
+			}
+		});
+		menuHelp.add(helpGetHelp);
+
+		// ajout item à propos
+		JMenuItem helpAbout = new JMenuItem(new AbstractAction("A propos") {
+			private static final long serialVersionUID = 9206470584933030896L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(frame,
+						"<html>" + "<h2 style='text-align: center'>DiceWars</h2>"
+								+ "<p style='text-align: center'>Projet Efrei L3 de Java</p>" + "<br>" + "<table>"
+								+ "<tbody>" + "<tr>" + "<td style='border-right: 1px solid black'>(C) 2020-21</td>"
+								+ "<td><p> Nil CAILLEUX, Paul GODIN,</p> <p>Moise ILOO LIANDJA</p></td>" + "</tr>"
+								+ "</tbody>" + "</table>" + "</html>",
+						"", JOptionPane.PLAIN_MESSAGE);
+
+			}
+		});
+		menuHelp.add(helpAbout);
+
+		// ajout du menu pop up au bouton
+		btnHelp.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				menuHelp.show(e.getComponent(), 0, e.getComponent().getHeight());
+			}
+		});
+		// ajout du bouton à la toolbar
 		btnContainer.add(btnHelp);
 
 		toolBar.add(btnContainer);
@@ -344,8 +428,8 @@ public class PartieUI {
 						}
 
 						// arriver ici, on a un gagnant
-						JOptionPane.showMessageDialog(frame, String.format(
-								"Victoire de Joueur %d", partie.getjGagnant().getId()));
+						JOptionPane.showMessageDialog(frame,
+								String.format("Victoire de Joueur %d", partie.getjGagnant().getId()));
 					}
 				}).start();
 			}

@@ -21,7 +21,7 @@ public class JoueurCellRenderer<T> extends JLabel implements ListCellRenderer<T>
 	public Component getListCellRendererComponent(JList<? extends T> list, T value, int index,
 			boolean isSelected, boolean cellHasFocus) {
 		// taken from https://docs.oracle.com/javase/7/docs/api/javax/swing/ListCellRenderer.html
-		setText((value == null ? "" : value.toString()));
+		setText((value == null ? "" : ((Joueur) value).infosJoueur()));
 
         Color background;
         Color foreground;

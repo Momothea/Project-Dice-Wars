@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aide DiceWars</title>
+  </head>
+
+  <body>
+
+    <div class="content">
+      <h1>DiceWars</h1>
+      <p>
+        DiceWars est un jeu de stratégie dans lequel vous devez conquérir
+        l'intégralité des territoires des joueurs adverses.
+      </p>
+
+      <h2 id="regle">Règles du jeu</h2>
+      Il s’agit d’un jeu répondant aux règles suivantes :
+      <ul>
+        <li>Il se joue sur une carte contenant plusieurs territoires.</li>
+        <li>
+          Chaque territoire a une « force » représentée par un nombre de dés (à
+          6 faces).
+        </li>
+        <li>
+          Chaque territoire ne peut avoir plus de 8 dès sur un territoire.
+        </li>
+        <li>Chaque territoire appartient à un seul joueur.</li>
+        <li>Chaque joueur possède un ou plusieurs territoire(s).</li>
+      </ul>
+
+      <h2 id="preparation">Préparation</h2>
+      Initialement (au début de la partie):
+      <ul>
+        <li>Un nombre de joueurs est désigné</li>
+        <li>
+          Les territoires sont attribués aléatoirement aux différents joueurs
+        </li>
+        <li>
+          Tous les joueurs possèdent le même nombre de dès répartis
+          aléatoirement sur leurs territoires.
+        </li>
+      </ul>
+
+      <h2 id="partie">Déroulement d'une partie</h2>
+      <p>
+        A chaque tour de jeu, un joueur est sélectionné aléatoirement pour faire
+        une attaque.
+      </p>
+
+      <h3 id="attaque">Déroulement d'une attaque</h3>
+      <p>
+        Lors de son tour, le joueur choisit parmi ses territoires celui qu'il
+        veut étendre puis un territoire voisin pour l'attaquer.
+      </p>
+      <p>
+        Le <em>joueur attaquant</em> lance alors ses dés (tous les dés du
+        territoire à étendre) <br />
+        Le <em>joueur adverse</em> (propriétaire du territoire attaqué) de son
+        côté lance ses dés (tous les dés duterritoire attaqué).
+      </p>
+      <p>
+        La bataille se fait en additionnant les points des dés en attaque (somme
+        des points sur les faces) et les comparant à la somme obtenue des dés en
+        défense.
+      </p>
+
+      <h3 id="fin-attaque">Issue de l'attaque</h3>
+      <p>
+        Si l'attaquant fait plus de points, il déplace ses dés sur le territoire
+        conquis, sauf un qui reste sur le territoire de départ et les dés
+        vaincus de l'adversaire disparaissent.<br />
+        Si l'attaquant perd, il ne conserve qu'un seul dé sur son territoire et
+        le territoire attaqué reste inchangé.
+      </p>
+
+      <p>
+        <strong>Note :</strong> Les territoires à un seul dé ne peuvent pas être
+        étendu.
+      </p>
+
+      <p>
+        Pendant son tour, un joueur peut attaquer autant de fois qu’il le
+        souhaite.
+      </p>
+      
+      Son tour se termine :
+      <ul>
+        <li>
+          S’il décide lui-même de l'arrêter (grâce à un bouton « Fin tour »)
+        </li>
+        <li>S’il a perdu tous ses territoires.</li>
+      </ul>
+
+      <h2 id="fin-tour">Fin du tour</h2>
+      <p>
+        A la fin de son tour, si le joueur n’a pas encore perdu, il reçoit en
+        bonus autant de dés que le plus grand nombre de territoires contigus de
+        sa couleur. <br />
+        Ces dés de renfort sont répartis aléatoirement sur ses territoires.
+      </p>
+    </div>
+  </body>
+</html>

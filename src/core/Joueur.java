@@ -62,10 +62,8 @@ public class Joueur implements Serializable {
 		Joueur.nbTerritoireCarte = nbTerritoire;
 	}
 
-	@Override
-	public String toString() {
-		// return "Joueur [id=" + id + ", couleur=" + couleur + ", listeTerritoire=" +
-		// listeTerritoire + "]";
+	
+	public String infosJoueur() {
 		return String.format(
 				"<html>" + "<h3 style='margin: 0.5em 0'>Joueur %d</h3>"
 						+ "<p style='padding-left: 10px'>Nb terr: %d<small>/%d</small> (%d %%)</p>" + "</html>",
