@@ -317,18 +317,19 @@ public class Carte implements Serializable {
 			for (int j = 0; j < 33; j++) {
 				Territoire terrain = carte[i][j];
 				String joueurColor = terrain == null ? ConsoleColors.RESET
-						: ConsoleColors.ColorToASCII(terrain.getJoueur().getCouleur());
+						: ConsoleColors.colorToASCII(terrain.getJoueur().getCouleur());
+				String joueurBoldColor = terrain == null ? ConsoleColors.RESET
+						: ConsoleColors.colorToASCIIBold(terrain.getJoueur().getCouleur());
 
-				result += String.format(joueurColor + "%2d,%d ", terrain != null ? terrain.getId() : 0,
-						terrain != null ? terrain.getForce() : 0);
+				result += String.format(joueurBoldColor + "%2d" + joueurColor + ",%d ",
+						terrain != null ? terrain.getId() : 0, terrain != null ? terrain.getForce() : 0);
 			}
 			result += "\n";
 		}
 
 		// info Carte
-		result += ConsoleColors.RESET + "Carte: nbJoueurs=" + nbJoueurs + ", nbTerritoire=" + nbTerritoire
-				+ ",\ncarte=\n";
-		
+		result += ConsoleColors.RESET + "Carte: nbJoueurs=" + nbJoueurs + ", nbTerritoire=" + nbTerritoire;
+
 		return result += "\n";
 	}
 

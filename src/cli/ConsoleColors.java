@@ -4,16 +4,28 @@ import java.awt.Color;
 import java.util.Map;
 
 public class ConsoleColors {
-	private static final Map<Color, String> colorsConverter = Map.of(Color.GREEN, ConsoleColors.GREEN, Color.BLUE,
+	private static final Map<Color, String> colorConverter = Map.of(Color.GREEN, ConsoleColors.GREEN, Color.BLUE,
 			ConsoleColors.BLUE, Color.PINK, ConsoleColors.PURPLE_BRIGHT, Color.CYAN, ConsoleColors.CYAN, Color.MAGENTA,
 			ConsoleColors.PURPLE, Color.RED, ConsoleColors.RED, Color.YELLOW, ConsoleColors.YELLOW, Color.WHITE,
-			ConsoleColors.RESET);
+			ConsoleColors.WHITE);
+	
+	private static final  Map<Color, String> backgroundConverter = Map.of(Color.GREEN, ConsoleColors.GREEN_BACKGROUND,
+			Color.BLUE, ConsoleColors.BLUE_BACKGROUND, Color.PINK, ConsoleColors.PURPLE_BACKGROUND_BRIGHT,
+			Color.CYAN, ConsoleColors.CYAN_BACKGROUND, Color.MAGENTA, ConsoleColors.PURPLE_BACKGROUND, 
+			Color.RED, ConsoleColors.RED_BACKGROUND, Color.YELLOW, ConsoleColors.YELLOW_BACKGROUND, Color.WHITE,
+			ConsoleColors.WHITE_BACKGROUND);
+	
+	private static final Map<Color, String> boldConverter = Map.of(Color.GREEN, ConsoleColors.GREEN_BOLD, Color.BLUE,
+			ConsoleColors.BLUE_BOLD, Color.PINK, ConsoleColors.PURPLE_BOLD_BRIGHT, Color.CYAN, ConsoleColors.CYAN_BOLD,
+			Color.MAGENTA, ConsoleColors.PURPLE_BOLD, Color.RED, ConsoleColors.RED_BOLD, Color.YELLOW,
+			ConsoleColors.YELLOW_BOLD, Color.WHITE, ConsoleColors.WHITE_BOLD);
 	
 	// How to print color in console using System.out.println?
 	// https://stackoverflow.com/a/45444716
 
 	// Reset
     public static final String RESET = "\033[0m";  // Text Reset
+    public static final String CLEAR = "\033[2J";
 
     // Regular Colors
     public static final String BLACK = "\033[0;30m";   // BLACK
@@ -85,7 +97,15 @@ public class ConsoleColors {
     public static final String CYAN_BACKGROUND_BRIGHT = "\033[0;106m";  // CYAN
     public static final String WHITE_BACKGROUND_BRIGHT = "\033[0;107m";   // WHITE
     
-	public static String ColorToASCII(Color color) {
-		return colorsConverter.get(color);
+	public static String colorToASCII(Color color) {
+		return colorConverter.get(color);
+	}
+	
+	public static String colorToASCIIBackground(Color color) {
+		return backgroundConverter.get(color);
+	}
+	
+	public static String colorToASCIIBold(Color color) {
+		return boldConverter.get(color);
 	}
 }

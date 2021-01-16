@@ -69,6 +69,13 @@ public class Joueur implements Serializable {
 						+ "<p style='padding-left: 10px'>Nb terr: %d<small>/%d</small> (%d %%)</p>" + "</html>",
 				id, listeTerritoire.size(), nbTerritoireCarte, (listeTerritoire.size() * 100) / nbTerritoireCarte);
 	}
+	
+	@Override
+	public String toString() {
+		return String.format(
+				"Joueur %d [%d (%d %%)]",
+				id, listeTerritoire.size(), (listeTerritoire.size() * 100) / nbTerritoireCarte);
+	}
 
 	/*
 	 * Gestion attaque
@@ -205,6 +212,7 @@ public class Joueur implements Serializable {
 			}
 		}
 		
+		System.out.println();
 		return nbAttribution;
 	}
 

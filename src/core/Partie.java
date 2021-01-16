@@ -68,7 +68,7 @@ public class Partie implements Serializable {
 		nbTour++;
 	}
 
-	public synchronized void updatePartie() {
+	public void updatePartie() {
 		// supprimer les joueurs n'ayant plus de territoire
 		List<Joueur> perdants = Arrays.stream(joueurs).filter(j -> (j == null ? -1 : j.getNbListeTerritoire()) == 0)
 				.collect(Collectors.toList());
@@ -85,8 +85,6 @@ public class Partie implements Serializable {
 		
 		if (gagnant != null)
 			System.out.printf("Gagnant : Joueur %d\n", gagnant.getId());
-
-		notifyAll();
 	}
 
 	/*
