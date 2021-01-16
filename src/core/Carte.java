@@ -7,12 +7,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import cli.ConsoleColors;
+
 public class Carte implements Serializable {
 	private static final long serialVersionUID = 3489345836813193945L;
-	
+
 	private int nbJoueurs;
 	private int nbTerritoire;
 	private ArrayList<Territoire> territoires;
@@ -43,25 +46,25 @@ public class Carte implements Serializable {
 
 			int posX = randX.nextInt(29) + 2;
 			int posY = randY.nextInt(29) + 2;
-			
+
 			// Si la position est valide, ajouter le territoire et l'agrandir !
 			if (k == 0 || positionValide(posX, posY)) {
 				// Si emplacement de la carte est vide, la remplir d'un nouveau territoire
 				if (carte[posX][posY] == null) {
 					k++; // augmenter le nb de territoire créé et le créer,...
 					Territoire nouvTerr = new Territoire(k + 1);
-					
+
 					// ... le placer,...
 					carte[posX][posY] = nouvTerr;
 					// ... l'ajouter à la liste des territoires
 					territoires.add(nouvTerr);
 					// ... et l'agrandir
 					agrandirTerrain(nouvTerr, posX, posY);
-				}	
+				}
 			}
 
 		}
-		
+
 		/*
 		 * Calcul des voisins pour chaque territoire
 		 * =========================================
@@ -69,13 +72,13 @@ public class Carte implements Serializable {
 		for (int i = 0; i < 33; i++) {
 			for (int j = 0; j < 33; j++) {
 				// obtenir les voisins pour chaque territoire
-				HashMap<String, Long> voisins = getTerrainsVoisins(i,j);
-				
+				HashMap<String, Long> voisins = getTerrainsVoisins(i, j);
+
 				// et les ajouter
 				for (Map.Entry<String, Long> mapVoisin : voisins.entrySet()) {
 					Long mapVoisinValue = mapVoisin.getValue();
 					Territoire curTerr = carte[i][j];
-					
+
 					if (mapVoisinValue != 0 && curTerr != null) {
 						// ne pas ajouter soi-même
 						if (mapVoisinValue != curTerr.getId()) {
@@ -85,14 +88,13 @@ public class Carte implements Serializable {
 				}
 			}
 		}
-		
 
 		/*
 		 * Distribution des territoires aux joueurs
 		 * ========================================
 		 */
 		Joueur.setNbTerritoireCarte(nbTerritoire);
-		
+
 		int nb_des_par_joueur = 5 * (nbTerritoire / nbJoueurs);
 		int[] nbDesJoueurs = new int[nbJoueurs];
 		Arrays.fill(nbDesJoueurs, nb_des_par_joueur);
@@ -100,7 +102,7 @@ public class Carte implements Serializable {
 
 		// mélanger liste territoire
 		Collections.shuffle(territoires);
-		
+
 		for (int i = 0; i < nbJoueurs; i++) {
 			for (int j = 0; j < nb_terr_par_joueur; j++) {
 				Territoire terrJoueur = territoires.get(i * nb_terr_par_joueur + j);
@@ -117,28 +119,28 @@ public class Carte implements Serializable {
 
 				territoires.set(i * nb_terr_par_joueur + j, terrJoueur);
 			}
-			
+
 			// distribution des forces aux territoires du joueur
 			while (nbDesJoueurs[i] > 0) {
 				Random aleat = new Random();
-				int randIndex = aleat.nextInt(nb_terr_par_joueur) + i*nb_terr_par_joueur;
-				
+				int randIndex = aleat.nextInt(nb_terr_par_joueur) + i * nb_terr_par_joueur;
+
 				Territoire fTerr = territoires.get(randIndex);
-				if (fTerr.getForce() +1 <= 8) {
+				if (fTerr.getForce() + 1 <= 8) {
 					fTerr.setForce(fTerr.getForce() + 1);
 					territoires.set(randIndex, fTerr);
 					nbDesJoueurs[i]--;
 				}
 			}
-			
+
 			// verif somme des territoires
 			int sommeDesTerr = 0;
 			for (int t = 0; t < nb_terr_par_joueur; t++) {
 				sommeDesTerr += territoires.get(i * nb_terr_par_joueur + t).getForce();
 			}
-			
+
 			System.out.printf("joueur:%d, dés:%s\n", i, sommeDesTerr == nb_des_par_joueur ? "OK" : "KO :(");
-			
+
 		}
 
 	}
@@ -185,18 +187,18 @@ public class Carte implements Serializable {
 
 	protected boolean positionValide(int posX, int posY) {
 		HashMap<String, Long> voisins = getTerrainsVoisins(posX, posY);
-		
+
 		int nbIdVide = 0;
-		
-		for(Map.Entry<String, Long> curEntry : voisins.entrySet()) {
-			if(curEntry.getValue() != 0) {
+
+		for (Map.Entry<String, Long> curEntry : voisins.entrySet()) {
+			if (curEntry.getValue() != 0) {
 				nbIdVide++;
 			}
 		}
-		
+
 		return nbIdVide > 0 && nbIdVide < 6;
 	}
-	
+
 	protected void agrandirTerrain(Territoire territoire, int posX, int posY) {
 		Random randTaille = new Random();
 		int tailleTerr = randTaille.nextInt(25 - 7) + 7; // taille aproximative du terrain
@@ -282,13 +284,13 @@ public class Carte implements Serializable {
 
 			} else {
 				// On ne peut plus expand le terrain,
-				if(!forceContinue) {
+				if (!forceContinue) {
 					forceContinue = true;
-				} 
+				}
 				// quitter la boucle
 				else {
 					forceContinue = false;
-					t = tailleTerr + 1;					
+					t = tailleTerr + 1;
 				}
 			}
 
@@ -298,22 +300,35 @@ public class Carte implements Serializable {
 	public Territoire[][] getMatriceTerritoire() {
 		return carte; // rendre plus secure
 	}
-	
+
+	public List<Territoire> getTerritoires() {
+		return Collections.unmodifiableList(territoires);
+	}
+
 	public int getNbTerritoireCarte() {
 		return nbTerritoire;
 	}
 
 	@Override
 	public String toString() {
-		String result = "Carte: nbJoueurs=" + nbJoueurs + ", nbTerritoire=" + nbTerritoire + ",\ncarte=\n";
+		String result = "";
 		for (int i = 0; i < 33; i++) {
 			result += i % 2 == 1 ? "  " : "";
 			for (int j = 0; j < 33; j++) {
-				result += String.format("%2d ", carte[i][j] != null ? carte[i][j].getId() : 0);
+				Territoire terrain = carte[i][j];
+				String joueurColor = terrain == null ? ConsoleColors.RESET
+						: ConsoleColors.ColorToASCII(terrain.getJoueur().getCouleur());
+
+				result += String.format(joueurColor + "%2d,%d ", terrain != null ? terrain.getId() : 0,
+						terrain != null ? terrain.getForce() : 0);
 			}
 			result += "\n";
 		}
 
+		// info Carte
+		result += ConsoleColors.RESET + "Carte: nbJoueurs=" + nbJoueurs + ", nbTerritoire=" + nbTerritoire
+				+ ",\ncarte=\n";
+		
 		return result += "\n";
 	}
 

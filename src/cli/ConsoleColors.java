@@ -1,6 +1,14 @@
 package cli;
 
+import java.awt.Color;
+import java.util.Map;
+
 public class ConsoleColors {
+	private static final Map<Color, String> colorsConverter = Map.of(Color.GREEN, ConsoleColors.GREEN, Color.BLUE,
+			ConsoleColors.BLUE, Color.PINK, ConsoleColors.PURPLE_BRIGHT, Color.CYAN, ConsoleColors.CYAN, Color.MAGENTA,
+			ConsoleColors.PURPLE, Color.RED, ConsoleColors.RED, Color.YELLOW, ConsoleColors.YELLOW, Color.WHITE,
+			ConsoleColors.RESET);
+	
 	// How to print color in console using System.out.println?
 	// https://stackoverflow.com/a/45444716
 
@@ -76,4 +84,8 @@ public class ConsoleColors {
     public static final String PURPLE_BACKGROUND_BRIGHT = "\033[0;105m"; // PURPLE
     public static final String CYAN_BACKGROUND_BRIGHT = "\033[0;106m";  // CYAN
     public static final String WHITE_BACKGROUND_BRIGHT = "\033[0;107m";   // WHITE
+    
+	public static String ColorToASCII(Color color) {
+		return colorsConverter.get(color);
+	}
 }
