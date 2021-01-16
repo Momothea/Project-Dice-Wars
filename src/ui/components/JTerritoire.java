@@ -164,21 +164,4 @@ public class JTerritoire extends JButton {
 
 	}
 
-	public static void main(String[] args) {
-		/*
-		 * JComponent gui = new JPanel(new FlowLayout()); gui.add(new JTerritoire(1, 3,
-		 * new Color(255, 0, 0)));
-		 * 
-		 * JFrame f = new JFrame("Square Buttons"); f.add(gui); // Ensures JVM closes
-		 * after frame(s) closed and // all non-daemon threads are finished
-		 * f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // See
-		 * http://stackoverflow.com/a/7143398/418556 for demo.
-		 * f.setLocationByPlatform(true);
-		 * 
-		 * // ensures the frame is the minimum size it needs to be // in order display
-		 * the components within it f.setSize(400,400);; // should be done last, to
-		 * avoid flickering, moving, // resizing artifacts. f.setVisible(true);
-		 */
-	}
-
 }

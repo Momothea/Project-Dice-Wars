@@ -11,6 +11,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +37,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+
 import core.Joueur;
 import core.Partie;
 import ui.components.JCarte;
@@ -51,6 +54,9 @@ public class PartieUI {
 	private JList<Joueur> lstTourJoueur; // affichage joueur qui doit joueur
 
 	private Partie partie;
+	private String savePath = "";
+
+	private Thread updater = new UpdateUI();
 
 	/**
 	 * Launch the application.
@@ -77,14 +83,14 @@ public class PartieUI {
 		// Création partie
 		this.partie = new Partie(nbJoueurs);
 
-		frame = new JFrame();
+		frame = new JFrame("DiceWars");
 		frame.setBounds(100, 100, 640, 480);
 		// Get scale due to hiDPI Screen
 		AffineTransform scale = frame.getGraphicsConfiguration().getDefaultTransform();
 		frame.setMinimumSize(
 				new Dimension((int) Math.floor(640 * scale.getScaleX()), (int) Math.floor(480 * scale.getScaleY())));
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		initialize();
 	}
@@ -93,7 +99,7 @@ public class PartieUI {
 	 * UPDATES
 	 */
 
-	public void updateTourJoueur() {
+	private void updateTourJoueur() {
 		// update text of JList
 		lstTourJoueur.repaint();
 
@@ -112,6 +118,219 @@ public class PartieUI {
 		initialize();
 		frame.validate();
 		frame.setVisible(true);
+	}
+
+	private class UpdateUI extends Thread {
+		@Override
+		public void run() {
+			while (partie.getjGagnant() == null) {
+				// Runs inside of the Swing UI thread
+				// https://stackabuse.com/how-to-use-threads-in-java-swing/
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						// update infoTour
+						updateTourJoueur();
+					}
+				});
+
+				try {
+					java.lang.Thread.sleep(20);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			// arriver ici, on a un gagnant
+			JOptionPane.showMessageDialog(frame, String.format("Victoire de Joueur %d", partie.getjGagnant().getId()));
+		}
+
+		@Override
+		public synchronized void start() {
+			if (!isAlive()) {
+				super.start();
+			}
+		}
+
+	}
+
+	/*
+	 * HANDLERS
+	 */
+	private void nouvellePartie() {
+		// Choix dialogue nb Joueur
+		Integer[] possibilities = { 2, 3, 4, 5, 6, 7, 8 };
+		// Afficher dialogue nb Joueur
+		int nbJoueur = -1;
+		try {
+			nbJoueur = (int) JOptionPane.showInputDialog(frame, "Nombre de joueurs", "DiceWars - Nouvelle partie",
+					JOptionPane.QUESTION_MESSAGE, null, possibilities, 7);
+			savePath = "";
+		} catch (Exception e1) {
+			nbJoueur = -1;
+		}
+		// Si l'user n'a pas cancel, reset la GUI et charger la nouvelle partie
+		if (nbJoueur != -1) {
+			partie = new Partie(nbJoueur);
+			resetGUI();
+
+			// lancer le thread qui update infoTour
+			updater.start();
+		}
+	}
+
+	private void importCarte() {
+		// Create a file chooser
+		final JFileChooser fc = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Carte DiceWars", "csv");
+		fc.setFileFilter(filter);
+		fc.setAcceptAllFileFilterUsed(false);
+
+		// In response to a button click:
+		int returnVal = fc.showOpenDialog(frame);
+
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = fc.getSelectedFile();
+			String filename = file.getAbsolutePath();
+
+			// essayer d'importer la partie
+			try {
+				// Chargement de la carte
+				// TODO Put fonction here
+
+				// reset GUI
+				resetGUI();
+				savePath = "";
+
+				// lancer le thread qui update infoTour
+				updater.start();
+
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				// afficher dialogue erreur
+				JOptionPane.showMessageDialog(frame, e1.getMessage(),
+						String.format("Erreur lors de l'import de  %s", filename), JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
+	private void loadPartie() {
+		// Create a file chooser
+		final JFileChooser fc = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Partie DiceWars", "ser");
+		fc.setFileFilter(filter);
+		fc.setAcceptAllFileFilterUsed(false);
+
+		// In response to a button click:
+		int returnVal = fc.showOpenDialog(frame);
+
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = fc.getSelectedFile();
+			String filename = file.getAbsolutePath();
+
+			// essayer d'importer la partie
+			try {
+				// Chargement de la partie
+				partie = new Partie(filename);
+
+				// reset GUI
+				resetGUI();
+				frame.setTitle("DiceWars - " + filename);
+				savePath = filename;
+
+				// lancer le thread qui update infoTour
+				updater.start();
+			} catch (ClassNotFoundException | IOException e1) {
+				e1.printStackTrace();
+				// afficher dialogue erreur
+				JOptionPane.showMessageDialog(frame, e1.getMessage(),
+						String.format("Erreur lors de l'import de  %s", filename), JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
+	private void savePartie() {
+		// Create a file chooser
+		final JFileChooser fc = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Partie DiceWars", "ser");
+		fc.setFileFilter(filter);
+		fc.setAcceptAllFileFilterUsed(false);
+
+		// In response to a button click:
+		int returnVal = fc.showSaveDialog(frame);
+
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = fc.getSelectedFile();
+			String filename = file.getAbsolutePath();
+
+			// https://stackoverflow.com/a/13308477
+			if (!filename.endsWith("ser")) {
+				filename += ".ser";
+			}
+
+			// essayer de sauvegarder partie
+			try {
+				partie.serialize(filename);
+				
+				frame.setTitle("DiceWars - " + filename);
+				savePath = filename;
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				JOptionPane.showMessageDialog(frame, e1.getMessage(), "Erreur lors de l'enregistrement",
+						JOptionPane.ERROR_MESSAGE);
+			} finally {
+				JOptionPane.showMessageDialog(frame, String.format("Partie sauvegardée dans %s", filename));
+			}
+		}
+	}
+	
+	private class AutoSave implements WindowListener {
+
+		@Override
+		public void windowClosing(WindowEvent e) {
+				JFrame f = (JFrame)e.getSource();
+			
+				int reponse = JOptionPane.showConfirmDialog(f, "Sauver cette partie ?",
+						"DiceWars - AutoSave", JOptionPane.YES_NO_OPTION);
+				
+				if(reponse == JOptionPane.YES_OPTION) {
+					// Si pas de partie qui a été charger, demander endroit où la sauver
+					if(savePath.equals("")) {
+						savePartie();					
+					} 
+					// sinon, sauvegarde automatique :)
+					else {
+						try {
+							partie.serialize(savePath);
+						} catch (IOException e1) {
+							e1.printStackTrace();
+							JOptionPane.showMessageDialog(frame, e1.getMessage(), "Erreur lors de l'enregistrement",
+									JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				}
+				
+				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		}
+
+		public void windowOpened(WindowEvent e) {}
+		public void windowClosed(WindowEvent e) {}
+		public void windowIconified(WindowEvent e) {}
+		public void windowDeiconified(WindowEvent e) {}
+		public void windowActivated(WindowEvent e) {}
+		public void windowDeactivated(WindowEvent e) {}
+		
+	}
+
+	private void finTour() {
+		System.out.println("Fin tour");
+		partie.getjAttaquant().terminerTour();
+		// update carte
+		pnlCarte.repaint();
+
+		// passer le tour au prochain joueur tirer aléatoirement
+		partie.setTourJoueur();
+		// update Tour Joueur
+		updateTourJoueur();
 	}
 
 	/**
@@ -148,21 +367,7 @@ public class PartieUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Choix dialogue nb Joueur
-				Integer[] possibilities = { 2, 3, 4, 5, 6, 7, 8 };
-				// Afficher dialogue nb Joueur
-				int nbJoueur = -1;
-				try {
-					nbJoueur = (int) JOptionPane.showInputDialog(frame, "Nombre de joueurs",
-							"DiceWars - Nouvelle partie", JOptionPane.QUESTION_MESSAGE, null, possibilities, 7);
-				} catch (Exception e1) {
-					nbJoueur = -1;
-				}
-				// Si l'user n'a pas cancel, reset la GUI et charger la nouvelle partie
-				if (nbJoueur != -1) {
-					PartieUI.this.partie = new Partie(nbJoueur);
-					PartieUI.this.resetGUI();
-				}
+				nouvellePartie();
 			}
 		});
 		menuNew.add(newEmptyPartie);
@@ -172,33 +377,7 @@ public class PartieUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Create a file chooser
-				final JFileChooser fc = new JFileChooser();
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Carte DiceWars", "csv");
-				fc.setFileFilter(filter);
-				fc.setAcceptAllFileFilterUsed(false);
-
-				// In response to a button click:
-				int returnVal = fc.showOpenDialog(frame);
-
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File file = fc.getSelectedFile();
-					String filename = file.getAbsolutePath();
-
-					// essayer d'importer la partie
-					try {
-						// Chargement de la carte
-						// TODO Put fonction here
-						// reset GUI
-						resetGUI();
-					} catch (Exception e1) {
-						e1.printStackTrace();
-						// afficher dialogue erreur
-						JOptionPane.showMessageDialog(frame, e1.getMessage(),
-								String.format("Erreur lors de l'import de  %s", filename), JOptionPane.ERROR_MESSAGE);
-					}
-				}
-
+				importCarte();
 			}
 		});
 		menuNew.add(newCSVPartie);
@@ -221,32 +400,7 @@ public class PartieUI {
 		btnOpen.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Create a file chooser
-				final JFileChooser fc = new JFileChooser();
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Partie DiceWars", "ser");
-				fc.setFileFilter(filter);
-				fc.setAcceptAllFileFilterUsed(false);
-				
-				// In response to a button click:
-				int returnVal = fc.showOpenDialog(frame);
-
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File file = fc.getSelectedFile();
-					String filename = file.getAbsolutePath();
-
-					// essayer d'importer la partie
-					try {
-						// Chargement de la partie
-						partie = new Partie(filename);
-						// reset GUI
-						resetGUI();
-					} catch (ClassNotFoundException | IOException e1) {
-						e1.printStackTrace();
-						// afficher dialogue erreur
-						JOptionPane.showMessageDialog(frame, e1.getMessage(),
-								String.format("Erreur lors de l'import de  %s", filename), JOptionPane.ERROR_MESSAGE);
-					}
-				}
+				loadPartie();
 			}
 		});
 		// ajout du bouton à la toolbar
@@ -261,35 +415,7 @@ public class PartieUI {
 		btnSave.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Create a file chooser
-				final JFileChooser fc = new JFileChooser();
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Partie DiceWars", "ser");
-				fc.setFileFilter(filter);
-				fc.setAcceptAllFileFilterUsed(false);
-				
-				// In response to a button click:
-				int returnVal = fc.showSaveDialog(frame);
-
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File file = fc.getSelectedFile();
-					String filename = file.getAbsolutePath();
-					
-					// https://stackoverflow.com/a/13308477
-					if(!filename.endsWith("ser")){
-						filename += ".ser";
-					}
-
-					// essayer de sauvegarder partie
-					try {
-						partie.serialize(filename);
-					} catch (IOException e1) {
-						e1.printStackTrace();
-						JOptionPane.showMessageDialog(frame, e1.getMessage(), "Erreur lors de l'enregistrement",
-								JOptionPane.ERROR_MESSAGE);
-					} finally {
-						JOptionPane.showMessageDialog(frame, String.format("Partie sauvegardée dans %s", filename));
-					}
-				}
+				savePartie();
 			}
 		});
 		// ajout du bouton à la toolbar
@@ -366,16 +492,7 @@ public class PartieUI {
 		btnFinTour.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Fin tour");
-				partie.getjAttaquant().terminerTour();
-				// update carte
-				pnlCarte.repaint();
-
-				// passer le tour au prochain joueur tirer aléatoirement
-				partie.setTourJoueur();
-				// update Tour Joueur
-				updateTourJoueur();
-
+				finTour();
 			}
 		});
 		// ajout du bouton à infoTour
@@ -405,33 +522,9 @@ public class PartieUI {
 
 				infoTour.setPreferredSize(newSize);
 
-				// lancer le thread qui update infoTour
 				// Runs outside of the Swing UI thread
-				new Thread(new Runnable() {
-					public void run() {
-						while (partie.getjGagnant() == null) {
-
-							// Runs inside of the Swing UI thread
-							// https://stackabuse.com/how-to-use-threads-in-java-swing/
-							SwingUtilities.invokeLater(new Runnable() {
-								public void run() {
-									// update infoTour
-									updateTourJoueur();
-								}
-							});
-
-							try {
-								java.lang.Thread.sleep(20);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-
-						// arriver ici, on a un gagnant
-						JOptionPane.showMessageDialog(frame,
-								String.format("Victoire de Joueur %d", partie.getjGagnant().getId()));
-					}
-				}).start();
+				// lancer le thread qui update infoTour
+				updater.start();
 			}
 
 			@Override
@@ -448,13 +541,12 @@ public class PartieUI {
 			}
 
 			@Override
-			public void componentMoved(ComponentEvent e) {
-			}
-
-			@Override
-			public void componentHidden(ComponentEvent e) {
-			}
+			public void componentMoved(ComponentEvent e) { }
+			public void componentHidden(ComponentEvent e) { }
 		});
+		
+		// autosave feature !
+		frame.addWindowListener(new AutoSave());
 	}
 
 }

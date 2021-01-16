@@ -137,19 +137,4 @@ public class JCarte extends JPanel {
 		super.paint(g);
 	}
 
-	public static void main(String[] args) {
-		/*
-		 * int nbJoueurs = 7; Color[] colors = { Color.GREEN, Color.BLUE, Color.PINK,
-		 * Color.CYAN, Color.MAGENTA, Color.RED, Color.YELLOW }; Joueur[] joueurs = new
-		 * Joueur[nbJoueurs]; System.out.println("Création joueurs..."); for (int i = 0;
-		 * i < nbJoueurs; i++) { Joueur newJoueur = new Joueur(i + 1, colors[i]);
-		 * joueurs[i] = newJoueur; } System.out.println("Création carte..."); Carte map
-		 * = new Carte(joueurs); System.out.println(map);
-		 * 
-		 * JCarte hexPattern = new JCarte(map); hexPattern.setjAttaquant(joueurs[0]);
-		 * JFrame frame = new JFrame(); frame.setTitle("Hexagon Pattern");
-		 * frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		 * frame.getContentPane().add(hexPattern); frame.pack(); frame.setVisible(true);
-		 */
-	}
 }
