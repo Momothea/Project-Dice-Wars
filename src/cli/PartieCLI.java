@@ -74,7 +74,7 @@ public class PartieCLI {
 				break;
 			case 2:
 				// New sur carte existante
-				System.out.print("Charger carte de (chemin + nomFichier.csv) : ");
+				System.out.print("Charger carte de (chemin/nomFichier.csv) : ");
 				String filenameCSV = sc.nextLine();
 				if (!filenameCSV.endsWith("ser")) {
 					filenameCSV += ".ser";
@@ -90,7 +90,7 @@ public class PartieCLI {
 
 			case 3:
 				// Charger partie
-				System.out.print("Charger partie de (chemin + nomFichier.ser) : ");
+				System.out.print("Charger partie de (chemin/nomFichier.ser) : ");
 				String filename = sc.nextLine();
 				if (!filename.endsWith("ser")) {
 					filename += ".ser";
@@ -225,7 +225,7 @@ public class PartieCLI {
 
 			case "save":
 				// sauver partie
-				System.out.print("Sauvegarder dans (chemin + nomFichier) : ");
+				System.out.print("Sauvegarder dans (chemin/nomFichier) : ");
 				String filename = sc.nextLine();
 				if (!filename.endsWith("ser")) {
 					filename += ".ser";
