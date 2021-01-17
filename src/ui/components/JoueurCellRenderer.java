@@ -9,7 +9,7 @@ import javax.swing.ListCellRenderer;
 
 import core.Joueur;
 
-public class JoueurCellRenderer<T> extends JLabel implements ListCellRenderer<T> {
+public class JoueurCellRenderer<T extends Joueur> extends JLabel implements ListCellRenderer<T> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -21,7 +21,7 @@ public class JoueurCellRenderer<T> extends JLabel implements ListCellRenderer<T>
 	public Component getListCellRendererComponent(JList<? extends T> list, T value, int index,
 			boolean isSelected, boolean cellHasFocus) {
 		// taken from https://docs.oracle.com/javase/7/docs/api/javax/swing/ListCellRenderer.html
-		setText((value == null ? "" : ((Joueur) value).infosJoueur()));
+		setText((value == null ? "" : value.infosJoueur()));
 
         Color background;
         Color foreground;
@@ -37,7 +37,7 @@ public class JoueurCellRenderer<T> extends JLabel implements ListCellRenderer<T>
 
         // check if this cell is selected et le colorer selon la couleur du joueur
         } else if (isSelected) {
-        	Joueur j = (Joueur) value;
+        	Joueur j = value;
             background = j.getCouleur();
             foreground = Color.WHITE;
 
