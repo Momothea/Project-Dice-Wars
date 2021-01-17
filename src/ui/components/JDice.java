@@ -2,7 +2,6 @@ package ui.components;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 
 import javax.swing.*;
@@ -102,28 +101,6 @@ public class JDice extends JComponent {
         // draw inside light border
         g.setColor(Color.decode("#c0c0c0"));
         g.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, arc.width, arc.height);
-	}
-
-	public static void main(String[] args) {
-		
-		  JComponent gui = new JPanel(new FlowLayout());
-		  gui.add(new JDice(4, Color.RED));
-		  
-		  JFrame f = new JFrame("Test JDice");
-		  f.add(gui);
-		  // Ensures JVM closes after frame(s) closed and
-		  // all non-daemon threads are finished
-		  f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		  // See http://stackoverflow.com/a/7143398/418556 for demo.
-		  f.setLocationByPlatform(true);
-		  
-		  // ensures the frame is the minimum size it needs to be 
-		  // in order display the components within it
-		  f.pack(); // should be done last, to void flickering, moving,
-		  // resizing artifacts.
-		  f.setVisible(true);
-		 
-
 	}
 
 }
