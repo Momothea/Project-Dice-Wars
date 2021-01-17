@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
 import cli.ConsoleColors;
 
@@ -20,6 +21,60 @@ public class Carte implements Serializable {
 	private int nbTerritoire;
 	private ArrayList<Territoire> territoires;
 	private Territoire[][] carte = new Territoire[33][33];
+
+	// constructeur carte à partir d'un fichier csv
+	public Carte(int nbJoueurs, int nbTerritoire, Joueur[] joueurs, Scanner mapscan) {
+		this.nbTerritoire = nbTerritoire;
+		this.nbJoueurs = nbJoueurs;
+		this.territoires = new ArrayList<>(nbTerritoire);
+		String[] force = mapscan.nextLine().split(";");
+		String[] proprio = mapscan.nextLine().split(";");
+
+		// initialisation des territoires
+		for (int i = 0; i < nbTerritoire; i++) {
+			Territoire newTerr = new Territoire(i + 1);
+			newTerr.setForce(Integer.parseInt(force[i]));
+			newTerr.setJoueur(joueurs[Integer.parseInt(proprio[i]) - 1]);
+			joueurs[Integer.parseInt(proprio[i]) - 1].addTerritoire(newTerr);
+			territoires.add(newTerr);
+		}
+		// placement des territoire sur la carte
+		for (int i = 0; i < 33; i++) {
+			String[] ligne = mapscan.nextLine().split(";");
+			for (int j = 0; j < 33; j++) {
+				if (ligne[j].equals("0")) {
+					this.carte[i][j] = null;
+				} else {
+					this.carte[i][j] = territoires.get(Integer.parseInt(ligne[j]) - 1); // pas sur du sens de la carte à
+					// testé
+				}
+			}
+		}
+
+		// clacul des voisins des territoires
+		for (int i = 0; i < 33; i++) {
+			for (int j = 0; j < 33; j++) {
+				// obtenir les voisins pour chaque territoire
+				HashMap<String, Long> voisins = getTerrainsVoisins(i, j);
+
+				// et les ajouter
+				for (Map.Entry<String, Long> mapVoisin : voisins.entrySet()) {
+					Long mapVoisinValue = mapVoisin.getValue();
+					Territoire curTerr = carte[i][j];
+
+					if (mapVoisinValue != 0 && curTerr != null) {
+						// ne pas ajouter soi-même
+						if (mapVoisinValue != curTerr.getId()) {
+							curTerr.addVoisins(mapVoisinValue);
+						}
+					}
+				}
+			}
+		}
+
+		// test connexité
+		// si le temps ajouter des tests de validité
+	}
 
 	// Ctor avec règles du jeu
 	public Carte(Joueur[] joueurs) {
@@ -321,8 +376,8 @@ public class Carte implements Serializable {
 				String joueurBoldColor = terrain == null ? ConsoleColors.RESET
 						: ConsoleColors.colorToASCIIBold(terrain.getJoueur().getCouleur());
 
-				result += String.format(joueurBoldColor + "%2d" + joueurColor + ",%d ",
-						terrain != null ? terrain.getId() : 0, terrain != null ? terrain.getForce() : 0);
+				result += joueurBoldColor + (terrain != null ? String.format("%2d", terrain.getId()) : "  ")
+						+ joueurColor + (terrain != null ? String.format(",%d ", terrain.getForce()) : "  ");
 			}
 			result += "\n";
 		}

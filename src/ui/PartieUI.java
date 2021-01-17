@@ -192,10 +192,10 @@ public class PartieUI {
 			File file = fc.getSelectedFile();
 			String filename = file.getAbsolutePath();
 
-			// essayer d'importer la partie
+			// essayer de charger la carte
 			try {
 				// Chargement de la carte
-				// TODO Put fonction here
+				partie = new Partie(new File(filename));
 
 				// reset GUI
 				resetGUI();

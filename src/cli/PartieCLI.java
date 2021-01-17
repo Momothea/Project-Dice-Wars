@@ -2,6 +2,7 @@ package cli;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -73,22 +74,34 @@ public class PartieCLI {
 				break;
 			case 2:
 				// New sur carte existante
+				System.out.print("Charger carte de (chemin + nomFichier.csv) : ");
+				String filenameCSV = sc.nextLine();
+				if (!filenameCSV.endsWith("ser")) {
+					filenameCSV += ".ser";
+				}
+				try {
+					partie = new Partie(new File(filenameCSV));
+					partieRunner();
+				} catch (Exception e) {
+					System.out.println("La partie n'a pu être chargée");
+					System.err.println(e.getMessage() + '\n');
+				}
 				break;
 
 			case 3:
 				// Charger partie
-				System.out.print("Charger partie de (chemin + nomFichier) : ");
+				System.out.print("Charger partie de (chemin + nomFichier.ser) : ");
 				String filename = sc.nextLine();
 				if (!filename.endsWith("ser")) {
 					filename += ".ser";
 				}
 				try {
 					partie = new Partie(filename);
+					partieRunner();
 				} catch (Exception e) {
+					System.out.println("La partie n'a pu être chargée");
 					System.err.println(e.getMessage() + '\n');
 				}
-
-				partieRunner();
 				break;
 
 			case 4:
@@ -174,12 +187,10 @@ public class PartieCLI {
 		}
 
 		// arrivé ici, on a un gagnant
-		System.out.printf(
-				ConsoleColors.GREEN_BACKGROUND 
-				+ "\n===========================================\n"
-				  + "========== Victoire de Joueur %d ===========\n" 
-				  + "===========================================\n\n\n",
-				partie.getjGagnant().getId());
+		if (partie.getjGagnant() != null)
+			System.out.printf(ConsoleColors.GREEN_BACKGROUND + "\n===========================================\n"
+					+ "========== Victoire de Joueur %d ===========\n"
+					+ "===========================================\n\n\n", partie.getjGagnant().getId());
 	}
 
 	/*
@@ -222,6 +233,7 @@ public class PartieCLI {
 				try {
 					partie.serialize(filename);
 				} catch (Exception e) {
+					System.out.println("La partie n'a pu être sauvegardée");
 					System.err.println(e.getMessage() + '\n');
 				}
 				break;
