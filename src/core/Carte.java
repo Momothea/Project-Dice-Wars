@@ -27,6 +27,9 @@ public class Carte implements Serializable {
 		this.nbTerritoire = nbTerritoire;
 		this.nbJoueurs = nbJoueurs;
 		this.territoires = new ArrayList<>(nbTerritoire);
+		Joueur.setNbTerritoireCarte(nbTerritoire);
+		
+		
 		String[] force = mapscan.nextLine().split(";");
 		String[] proprio = mapscan.nextLine().split(";");
 
@@ -38,6 +41,7 @@ public class Carte implements Serializable {
 			joueurs[Integer.parseInt(proprio[i]) - 1].addTerritoire(newTerr);
 			territoires.add(newTerr);
 		}
+		
 		// placement des territoire sur la carte
 		for (int i = 0; i < 33; i++) {
 			String[] ligne = mapscan.nextLine().split(";");
@@ -51,7 +55,7 @@ public class Carte implements Serializable {
 			}
 		}
 
-		// clacul des voisins des territoires
+		// calcul des voisins des territoires
 		for (int i = 0; i < 33; i++) {
 			for (int j = 0; j < 33; j++) {
 				// obtenir les voisins pour chaque territoire

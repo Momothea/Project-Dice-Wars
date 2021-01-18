@@ -37,7 +37,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-
 import core.Joueur;
 import core.Partie;
 import ui.components.JCarte;
@@ -112,12 +111,25 @@ public class PartieUI {
 		lblInfoTour.setText(String.format("<html><h2>Tour: %d</h3></html>", partie.getNbTour()));
 	}
 
-	public void resetGUI() {
+	private void resetGUI() {
 		// Réinitialiser la GUI
 		frame.getContentPane().removeAll();
 		initialize();
+
+		Dimension newSize = resizeRightPanel(frame);
+		infoTour.setPreferredSize(newSize);
+
 		frame.validate();
 		frame.setVisible(true);
+	}
+
+	private Dimension resizeRightPanel(Component c) {
+		// Get new size
+		Dimension newSize = c.getSize();
+		int cWidth = Math.max(130, (int) Math.round(0.15 * newSize.getWidth()));
+
+		newSize.setSize(cWidth, -1);
+		return newSize;
 	}
 
 	private class UpdateUI extends Thread {
@@ -270,7 +282,7 @@ public class PartieUI {
 			// essayer de sauvegarder partie
 			try {
 				partie.serialize(filename);
-				
+
 				frame.setTitle("DiceWars - " + filename);
 				savePath = filename;
 			} catch (IOException e1) {
@@ -282,43 +294,54 @@ public class PartieUI {
 			}
 		}
 	}
-	
+
 	private class AutoSave implements WindowListener {
 
 		@Override
 		public void windowClosing(WindowEvent e) {
-				JFrame f = (JFrame)e.getSource();
-			
-				int reponse = JOptionPane.showConfirmDialog(f, "Sauver cette partie ?",
-						"DiceWars - AutoSave", JOptionPane.YES_NO_OPTION);
-				
-				if(reponse == JOptionPane.YES_OPTION) {
-					// Si pas de partie qui a été charger, demander endroit où la sauver
-					if(savePath.equals("")) {
-						savePartie();					
-					} 
-					// sinon, sauvegarde automatique :)
-					else {
-						try {
-							partie.serialize(savePath);
-						} catch (IOException e1) {
-							e1.printStackTrace();
-							JOptionPane.showMessageDialog(frame, e1.getMessage(), "Erreur lors de l'enregistrement",
-									JOptionPane.ERROR_MESSAGE);
-						}
+			JFrame f = (JFrame) e.getSource();
+
+			int reponse = JOptionPane.showConfirmDialog(f, "Sauver cette partie ?", "DiceWars - AutoSave",
+					JOptionPane.YES_NO_OPTION);
+
+			if (reponse == JOptionPane.YES_OPTION) {
+				// Si pas de partie qui a été charger, demander endroit où la sauver
+				if (savePath.equals("")) {
+					savePartie();
+				}
+				// sinon, sauvegarde automatique :)
+				else {
+					try {
+						partie.serialize(savePath);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						JOptionPane.showMessageDialog(frame, e1.getMessage(), "Erreur lors de l'enregistrement",
+								JOptionPane.ERROR_MESSAGE);
 					}
 				}
-				
-				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			}
+
+			f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		}
 
-		public void windowOpened(WindowEvent e) {}
-		public void windowClosed(WindowEvent e) {}
-		public void windowIconified(WindowEvent e) {}
-		public void windowDeiconified(WindowEvent e) {}
-		public void windowActivated(WindowEvent e) {}
-		public void windowDeactivated(WindowEvent e) {}
-		
+		public void windowOpened(WindowEvent e) {
+		}
+
+		public void windowClosed(WindowEvent e) {
+		}
+
+		public void windowIconified(WindowEvent e) {
+		}
+
+		public void windowDeiconified(WindowEvent e) {
+		}
+
+		public void windowActivated(WindowEvent e) {
+		}
+
+		public void windowDeactivated(WindowEvent e) {
+		}
+
 	}
 
 	private void finTour() {
@@ -515,11 +538,7 @@ public class PartieUI {
 				Component c = (Component) e.getSource();
 
 				// Get new size
-				Dimension newSize = c.getSize();
-				int cWidth = Math.max(130, (int) Math.round(0.15 * newSize.getWidth()));
-
-				newSize.setSize(cWidth, -1);
-
+				Dimension newSize = resizeRightPanel(c);
 				infoTour.setPreferredSize(newSize);
 
 				// Runs outside of the Swing UI thread
@@ -530,21 +549,18 @@ public class PartieUI {
 			@Override
 			public void componentResized(ComponentEvent e) {
 				Component c = (Component) e.getSource();
-
-				// Get new size
-				Dimension newSize = c.getSize();
-				int cWidth = Math.max(130, (int) Math.round(0.15 * newSize.getWidth()));
-
-				newSize.setSize(cWidth, -1);
-
+				Dimension newSize = resizeRightPanel(c);
 				infoTour.setPreferredSize(newSize);
 			}
 
 			@Override
-			public void componentMoved(ComponentEvent e) { }
-			public void componentHidden(ComponentEvent e) { }
+			public void componentMoved(ComponentEvent e) {
+			}
+
+			public void componentHidden(ComponentEvent e) {
+			}
 		});
-		
+
 		// autosave feature !
 		frame.addWindowListener(new AutoSave());
 	}
